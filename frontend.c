@@ -63,8 +63,8 @@ pid_t
 frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
     int pipe_frontend2engine[2], int pipe_main2engine[2])
 {
-	struct passwd	*pw;
 	struct event	 ev_sigint, ev_sigterm;
+	struct passwd	*pw;
 	pid_t		 pid;
 
 	switch (pid = fork()) {

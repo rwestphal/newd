@@ -187,8 +187,8 @@ main(int argc, char *argv[])
 	    PF_UNSPEC, pipe_frontend2engine) == -1)
 		fatal("frontend2engine socketpair");
 
-	/* start children */
-	engine_pid = engine(main_conf, pipe_main2frontend,
+	/* Start children. */
+	engine_pid = engine(main_conf, pipe_main2engine,
 	    pipe_frontend2engine, pipe_main2frontend);
 	frontend_pid = frontend(main_conf, pipe_main2frontend,
 	    pipe_frontend2engine, pipe_main2engine);
@@ -315,7 +315,7 @@ main_dispatch_frontend(int fd, short event, void *bula)
 			if (main_reload() == -1)
 				log_warnx("configuration reload failed");
 			else
-				log_debug("configuration reloaded");
+				log_warnx("configuration reloaded");
 			break;
 		case IMSG_CTL_LOG_VERBOSE:
 			/* Already checked by frontend. */

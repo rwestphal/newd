@@ -118,8 +118,8 @@ engine(struct newd_conf *xconf, int pipe_main2engine[2],
 	signal(SIGHUP, SIG_IGN);
 
 	/* Setup pipes. */
-	close(pipe_frontend2engine[0]);
 	close(pipe_main2engine[0]);
+	close(pipe_frontend2engine[0]);
 	close(pipe_main2frontend[0]);
 	close(pipe_main2frontend[1]);
 
