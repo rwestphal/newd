@@ -61,6 +61,11 @@ struct newd_conf {
 #define OPT_VERBOSE	0x00000001
 #define OPT_VERBOSE2	0x00000002
 #define OPT_NOACTION	0x00000004
+	int		yesno_attribute;
+	int		integer_attribute;
+	char		*string_attribute;
+	struct in_addr	v4address_attribute;
+	struct in6_addr	v6address_attribute;
 };
 
 /* newd.c */

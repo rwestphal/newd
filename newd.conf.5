@@ -87,7 +87,9 @@ All settings can be configured globally or per group.
 .Pp
 .It Ic integer-attribute Ar integer
 .Pp
-.It Ic address-attribute Ar address
+.It Ic v4address-attribute Ar IPv4address
+.Pp
+.It Ic v6address-attribute Ar IPv6address
 .Pp
 .It Ic string-attribute Ar string
 .El
@@ -101,10 +103,13 @@ Specify a group, grouping one or more attributes.
 .Pp
 For example:
 .Bd -literal -offset indent
+yesno-attribute no;
 group Barrymore {
+	yesno-attribute yes;
 	integer-attribute 231;
 	string-attribute "Sparks";
-	address-attribute 1.2.3.4;
+	v4address-attribute 1.2.3.4;
+	v6address-attribute ::1;
 }
 .Ed
 .Sh FILES
