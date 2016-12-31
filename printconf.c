@@ -55,31 +55,31 @@ print_config(struct newd_conf *conf)
 	printf("global-yesno_attribute %s\n",
 	    conf->global_yesno_attribute ? "yes" : "no");
 
-	printf("integer-attribute %d", conf->integer_attribute);
-	printf("global-integer-attribute %d", conf->global_integer_attribute);
+	printf("integer-attribute %d\n", conf->integer_attribute);
+	printf("global-integer-attribute %d\n", conf->global_integer_attribute);
 
 	bufp = inet_net_ntop(AF_INET, &conf->v4address_attribute,
 	    conf->v4_bits, buf, sizeof(buf));
 	if (bufp != NULL)
-		printf("v4address-attribute %s", bufp);
+		printf("v4address-attribute %s\n", bufp);
 	bufp = inet_net_ntop(AF_INET, &conf->global_v4address_attribute,
 	    conf->global_v4_bits, buf, sizeof(buf));
 	if (bufp != NULL)
-		printf("global-v4address-attribute %s", bufp);
+		printf("global-v4address-attribute %s\n", bufp);
 
 	bufp = inet_net_ntop(AF_INET6, &conf->v6address_attribute,
 	    conf->v6_bits, buf, sizeof(buf));
 	if (bufp != NULL)
-		printf("v6address-attribute %s", bufp);
+		printf("v6address-attribute %s\n", bufp);
 	bufp = inet_net_ntop(AF_INET6, &conf->global_v6address_attribute,
 	    conf->global_v6_bits, buf, sizeof(buf));
 	if (bufp != NULL)
-		printf("global-v6address-attribute %s", bufp);
+		printf("global-v6address-attribute %s\n", bufp);
 
 	if (conf->string_attribute != NULL)
-		printf("string_attribute %s\n", conf->string_attribute);
+		printf("string_attribute \"%s\"\n", conf->string_attribute);
 	if (conf->global_string_attribute != NULL)
-		printf("global_string_attribute %s\n",
+		printf("global_string_attribute \"%s\"\n",
 		    conf->global_string_attribute);
 
 }
