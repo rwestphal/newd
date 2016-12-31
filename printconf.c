@@ -39,18 +39,6 @@ print_config(struct newd_conf *conf)
 
 	printf("csock %s\n", conf->csock);
 
-	if (conf->opts == 0) {
-		printf("<no opt set>\n");
-	} else {
-		if (conf->opts & OPT_VERBOSE)
-			printf("VERBOSE ");
-		if (conf->opts & OPT_VERBOSE2)
-			printf("VERBOSE2 ");
-		if (conf->opts & OPT_NOACTION)
-			printf("NOACTION ");
-		printf("\n");
-	}
-
 	printf("yesno-attribute %s\n",
 	    conf->yesno_attribute ? "yes" : "no");
 	printf("global-yesno_attribute %s\n",
