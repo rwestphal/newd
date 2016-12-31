@@ -411,15 +411,25 @@ lookup(char *s)
 {
 	/* this has to be sorted always */
 	static const struct keywords keywords[] = {
-		{"group",		GROUP},
-		{"include",		INCLUDE},
-		{"integer-attribute",	INTEGER_ATTRIBUTE},
-		{"no",			NO},
-		{"string-attribute",	STRING_ATTRIBUTE},
-		{"v4address-attribute",	V4ADDRESS_ATTRIBUTE},
-		{"v6address-attribute",	V6ADDRESS_ATTRIBUTE},
-		{"yes",			YES},
-		{"yesno-attribute",	YESNO_ATTRIBUTE}
+		{"global-integer-attribute",	GLOBAL_INTEGER_ATTRIBUTE},
+		{"global-string-attribute",	GLOBAL_STRING_ATTRIBUTE},
+		{"global-v4address-attribute",	GLOBAL_V4ADDRESS_ATTRIBUTE},
+		{"global-v6address-attribute",	GLOBAL_V6ADDRESS_ATTRIBUTE},
+		{"global-yesno-attribute",	GLOBAL_YESNO_ATTRIBUTE},
+		{"group",			GROUP},
+		{"group-integer-attribute",	GROUP_INTEGER_ATTRIBUTE},
+		{"group-string-attribute",	GROUP_STRING_ATTRIBUTE},
+		{"group-v4address-attribute",	GROUP_V4ADDRESS_ATTRIBUTE},
+		{"group-v6address-attribute",	GROUP_V6ADDRESS_ATTRIBUTE},
+		{"group-yesno-attribute",	GROUP_YESNO_ATTRIBUTE},
+		{"include",			INCLUDE},
+		{"integer-attribute",		INTEGER_ATTRIBUTE},
+		{"no",				NO},
+		{"string-attribute",		STRING_ATTRIBUTE},
+		{"v4address-attribute",		V4ADDRESS_ATTRIBUTE},
+		{"v6address-attribute",		V6ADDRESS_ATTRIBUTE},
+		{"yes",				YES},
+		{"yesno-attribute",		YESNO_ATTRIBUTE}
 	};
 	const struct keywords	*p;
 
