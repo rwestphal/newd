@@ -41,71 +41,65 @@ print_config(struct newd_conf *conf)
 
 	printf("yesno-attribute %s\n",
 	    conf->yesno_attribute ? "yes" : "no");
-	printf("global-yesno_attribute %s\n",
-	    conf->global_yesno_attribute ? "yes" : "no");
-
 	printf("integer-attribute %d\n", conf->integer_attribute);
-	printf("global-integer-attribute %d\n", conf->global_integer_attribute);
-
+	printf("string_attribute \"%s\"\n",
+	    conf->string_attribute ? conf->string_attribute : "");
 	bufp = inet_net_ntop(AF_INET, &conf->v4address_attribute,
 	    conf->v4_bits, buf, sizeof(buf));
-	if (bufp != NULL)
-		printf("v4address-attribute %s\n", bufp);
-	bufp = inet_net_ntop(AF_INET, &conf->global_v4address_attribute,
-	    conf->global_v4_bits, buf, sizeof(buf));
-	if (bufp != NULL)
-		printf("global-v4address-attribute %s\n", bufp);
-
+	printf("v4address-attribute %s\n", bufp ? bufp : "0.0.0.0/0");
 	bufp = inet_net_ntop(AF_INET6, &conf->v6address_attribute,
 	    conf->v6_bits, buf, sizeof(buf));
-	if (bufp != NULL)
-		printf("v6address-attribute %s\n", bufp);
+	printf("v6address-attribute %s\n", bufp ? bufp : "::0/0");
+	printf("\n");
+
+	printf("global-yesno_attribute %s\n",
+	    conf->global_yesno_attribute ? "yes" : "no");
+	printf("global-integer-attribute %d\n",
+	    conf->global_integer_attribute);
+	printf("global_string_attribute \"%s\"\n",
+	    conf->global_string_attribute ? conf->global_string_attribute : "");
+	bufp = inet_net_ntop(AF_INET, &conf->global_v4address_attribute,
+	    conf->global_v4_bits, buf, sizeof(buf));
+	printf("global-v4address-attribute %s\n", bufp ? bufp : "0.0.0.0/0");
 	bufp = inet_net_ntop(AF_INET6, &conf->global_v6address_attribute,
 	    conf->global_v6_bits, buf, sizeof(buf));
-	if (bufp != NULL)
-		printf("global-v6address-attribute %s\n", bufp);
+	printf("global-v6address-attribute %s\n", bufp ? bufp : "::0/0");
+	printf("\n");
 
-	if (conf->string_attribute != NULL)
-		printf("string_attribute \"%s\"\n", conf->string_attribute);
-	if (conf->global_string_attribute != NULL)
-		printf("global_string_attribute \"%s\"\n",
-		    conf->global_string_attribute);
 
 	LIST_FOREACH(g, &conf->group_list, entry) {
 		printf("group %s {\n", g->name);
+
 		printf("\tyesno-attribute %s\n",
 		    g->yesno_attribute ? "yes" : "no");
-		printf("\tgroup-yesno_attribute %s\n",
-		    g->group_yesno_attribute ? "yes" : "no");
-
 		printf("\tinteger-attribute %d\n", g->integer_attribute);
-		printf("\tgroup-integer-attribute %d\n",
-		    g->group_integer_attribute);
-
+		printf("\tstring_attribute \"%s\"\n",
+		    g->string_attribute ? g->string_attribute : "");
 		bufp = inet_net_ntop(AF_INET, &g->v4address_attribute,
 		    g->v4_bits, buf, sizeof(buf));
-		if (bufp != NULL)
-			printf("\tv4address-attribute %s\n", bufp);
-		bufp = inet_net_ntop(AF_INET, &g->group_v4address_attribute,
-		    g->group_v4_bits, buf, sizeof(buf));
-		if (bufp != NULL)
-			printf("\tgroup-v4address-attribute %s\n", bufp);
-
+		printf("\tv4address-attribute %s\n",
+		    bufp ? bufp : "0.0.0.0/0");
 		bufp = inet_net_ntop(AF_INET6, &g->v6address_attribute,
 		    g->v6_bits, buf, sizeof(buf));
-		if (bufp != NULL)
-			printf("\tv6address-attribute %s\n", bufp);
+		printf("\tv6address-attribute %s\n", bufp ? bufp : "::0/0");
+		printf("\n");
+
+		printf("\tgroup-yesno_attribute %s\n",
+		    g->group_yesno_attribute ? "yes" : "no");
+		printf("\tgroup-integer-attribute %d\n",
+		    g->group_integer_attribute);
+		printf("\tgroup_string_attribute \"%s\"\n",
+		    g->group_string_attribute ? g->group_string_attribute : "");
+		bufp = inet_net_ntop(AF_INET, &g->group_v4address_attribute,
+		    g->group_v4_bits, buf, sizeof(buf));
+		printf("\tgroup-v4address-attribute %s\n",
+		    bufp ? bufp : "0.0.0.0/0");
 		bufp = inet_net_ntop(AF_INET6, &g->group_v6address_attribute,
 		    g->group_v6_bits, buf, sizeof(buf));
+		printf("\tgroup-v6address-attribute %s\n",
+		    bufp ? bufp : "0.0.0.0/0");
 		if (bufp != NULL)
-			printf("\tgroup-v6address-attribute %s\n", bufp);
 
-		if (g->string_attribute != NULL)
-			printf("\tstring_attribute \"%s\"\n",
-			    g->string_attribute);
-		if (g->group_string_attribute != NULL)
-			printf("\tgroup_string_attribute \"%s\"\n",
-			    g->group_string_attribute);
 		printf("}\n");
 	}
 }
