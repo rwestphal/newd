@@ -87,45 +87,7 @@ void		 clear_config(struct newd_conf *xconf);
 static struct newd_conf	*conf;
 static int		 errors = 0;
 
-struct group	*group = NULL;
-
-struct config_defaults {
-	int		yesno_attribute;
-	int		global_yesno_attribute;
-
-	int		integer_attribute;
-	int		global_integer_attribute;
-
-	struct in_addr	v4address_attribute;
-	struct in_addr	global_v4address_attribute;
-
-	struct in6_addr	v6address_attribute;
-	struct in6_addr	global_v6address_attribute;
-
-	char		*string_attribute;
-	char		*global_string_attribute;
-};
-
-struct group_defaults {
-	int		yesno_attribute;
-	int		group_yesno_attribute;
-
-	int		integer_attribute;
-	int		group_integer_attribute;
-
-	struct in_addr	v4address_attribute;
-	struct in_addr	group_v4address_attribute;
-
-	struct in6_addr	v6address_attribute;
-	struct in6_addr	group_v6address_attribute;
-
-	char		*string_attribute;
-	char		*group_string_attribute;
-};
-
-struct config_defaults	 globaldefs;
-struct group_defaults	 groupdefs;
-struct config_defaults	*defs;
+static struct group	*group = NULL;
 
 struct group	*conf_get_group(char *);
 void		*conf_del_group(struct group *);
@@ -292,12 +254,8 @@ nl		: '\n' optnl		/* one or more newlines */
 
 group		: GROUP STRING {
 			group = conf_get_group($2);
-
-			memcpy(&groupdefs, defs, sizeof(groupdefs));
-			defs = &groupdefs;
 		} '{' optnl groupopts_l '}' {
 			group = NULL;
-			defs = &globaldefs;
 		}
 		;
 
@@ -757,9 +715,6 @@ parse_config(char *filename, int opts)
 		fatal("parse_config");
 	conf->opts = opts;
 
-	bzero(&globaldefs, sizeof(globaldefs));
-	defs = &globaldefs;
-
 	if ((file = pushfile(filename, !(conf->opts & OPT_NOACTION)))
 	    == NULL) {
 		free(conf);
@@ -885,6 +840,18 @@ conf_get_group(char *name)
 	g->name = strdup(name);
 	if (g->name == NULL)
 		errx(1, "get_group: strdup");
+
+	/* Inherit attributes set in global section. */
+	g->yesno_attribute = conf->yesno_attribute;
+	g->integer_attribute = conf->integer_attribute;
+	if (conf->string_attribute != NULL)
+		g->string_attribute = conf->string_attribute;
+	memcpy(&g->v4address_attribute, &conf->v4address_attribute,
+	    sizeof(g->v4address_attribute));
+	g->v4_bits = conf->v4_bits;
+	memcpy(&g->v6address_attribute, &conf->v6address_attribute,
+	    sizeof(g->v6address_attribute));
+	g->v6_bits = conf->v6_bits;
 
 	LIST_INSERT_HEAD(&conf->group_list, g, entry);
 
