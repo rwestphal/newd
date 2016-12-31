@@ -290,10 +290,6 @@ optnl		: '\n' optnl		/* zero or more newlines */
 nl		: '\n' optnl		/* one or more newlines */
 		;
 
-comma		: ','			/* zero or one comma */
-		| /*empty*/
-		;
-
 group		: GROUP STRING {
 			group = conf_get_group($2);
 
