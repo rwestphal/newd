@@ -24,6 +24,8 @@
 #include <sys/uio.h>
 #include <sys/wait.h>
 
+#include <netinet/in.h>
+
 #include <err.h>
 #include <errno.h>
 #include <event.h>
@@ -50,8 +52,6 @@ void	main_dispatch_engine(int, short, void *);
 
 int	main_reload(void);
 int	main_sendboth(enum imsg_type, void *, u_int16_t);
-
-struct newd_conf *parse_config(const char *, int);
 
 int	pipe_main2frontend[2];
 int	pipe_main2engine[2];
@@ -458,19 +458,6 @@ main_sendboth(enum imsg_type type, void *buf, u_int16_t len)
 	if (imsg_compose_event(iev_engine, type, 0, 0, -1, buf, len) == -1)
 		return (-1);
 	return (0);
-}
-
-struct newd_conf *
-parse_config(const char *filename, int opts)
-{
-	struct newd_conf *xconf;
-
-	xconf = malloc(sizeof(*xconf));
-	if (xconf != NULL) {
-		xconf->opts = opts;
-	}
-
-	return (xconf);
 }
 
 void

@@ -24,6 +24,8 @@
 #include <sys/socket.h>
 #include <sys/uio.h>
 
+#include <netinet/in.h>
+
 #include <errno.h>
 #include <event.h>
 #include <imsg.h>

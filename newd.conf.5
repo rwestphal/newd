@@ -40,24 +40,19 @@ config file is divided into three sections.
 User-defined variables may be defined and used later, simplifying the
 configuration file.
 .It Sy Global Configuration
-Global settings for
-.Xr newd 8 .
-Global settings can be overruled in groups.
+Zero or more
+.Xr newd 8
+attibutes.
 .It Sy Groups
-Setting can be grouped together into a number of separate groups that
-describe configurations applicable to specific situations.
-Attributes specified in groups override global settings.
+Named lists of
+zero or more
+.Xr newd 8
+attributes.
 .El
-.Pp
-Argument names not beginning with a letter, digit, or underscore
-must be quoted.
 .Pp
 Additional configuration files can be included with the
 .Ic include
-keyword, for example:
-.Bd -literal -offset indent
-include "/etc/newd.sub.conf"
-.Ed
+keyword.
 .Sh MACROS
 Macros can be defined that will later be expanded in context.
 Macro names must start with a letter, digit, or underscore,
@@ -65,19 +60,64 @@ and may contain any of those characters.
 Macro names may not be reserved words (for example,
 .Ic group )
 Macros are not expanded inside quotes.
-.Pp
-For example:
-.Bd -literal -offset indent
-hi="5"
-group Niven {
-	integer-attribute $hi
-}
-.Ed
-.Pp
-The same can be accomplished by specifying the integer-attribute
-globally or within a group declaration.
 .Sh GLOBAL CONFIGURATION
-All settings can be configured globally or per group.
+The global configuration section is a list of attribute specifications.
+.Pp
+Attributes with a
+.Sq global-
+prefix can be used
+.Em only
+in the global configuration section. These are
+.Pp
+.Bl -tag -width Ds -compact
+.It Xo
+.Ic global-yesno-attribute
+.Pq Ic yes Ns | Ns Ic no
+.Xc
+.Pp
+.It Ic global-integer-attribute Ar integer
+.Pp
+.It Ic global-v4address-attribute Ar IPv4address
+.Pp
+.It Ic global-v6address-attribute Ar IPv6address
+.Pp
+.It Ic global-string-attribute Ar string
+.El
+.Sh GROUPS
+A group is a named list of attributes, specified with
+.Bl -tag -width group-name
+.It Ic group Ar name { attribute list }
+.El
+.Pp
+Attibutes with the
+.Sq group-
+prefix can be used only a group. These are
+.Pp
+.Bl -tag -width Ds -compact
+.It Xo
+.Ic group-yesno-attribute
+.Pq Ic yes Ns | Ns Ic no
+.Xc
+.Pp
+.It Ic group-integer-attribute Ar integer
+.Pp
+.It Ic group-v4address-attribute Ar IPv4address
+.Pp
+.It Ic group-v6address-attribute Ar IPv6address
+.Pp
+.It Ic group-string-attribute Ar string
+.El
+.Sh COMMON ATTRIBUTES
+Attributes with neither
+.Sq global-
+nor
+.Sq group-
+prefixes can be used in either or both global and group configuration
+sections.
+If used in only the global configuration section then the specification is
+inherited by all groups.
+If used in both the sections, the specification in the group will take
+precedence in that group.
 .Pp
 .Bl -tag -width Ds -compact
 .It Xo
@@ -93,23 +133,16 @@ All settings can be configured globally or per group.
 .Pp
 .It Ic string-attribute Ar string
 .El
-.Sh GROUPS
-Groups are used for grouping attributes.
-All attributes can be configured per group, overruling the global settings.
-.Bl -tag -width group-name
-.It Ic group Ar name
-Specify a group, grouping one or more attributes.
-.El
-.Pp
-For example:
+.Sh EXAMPLE
 .Bd -literal -offset indent
+include "/etc/newd.sub.conf"
+hi="5"
+global-integer-attribute=$hi
 yesno-attribute no;
 group Barrymore {
 	yesno-attribute yes;
-	integer-attribute 231;
-	string-attribute "Sparks";
-	v4address-attribute 1.2.3.4;
-	v6address-attribute ::1;
+	group-string-attribute "Sparks";
+	group-integer-attribute $hi;
 }
 .Ed
 .Sh FILES

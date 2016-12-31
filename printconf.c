@@ -21,6 +21,8 @@
 #include <sys/queue.h>
 #include <sys/uio.h>
 
+#include <netinet/in.h>
+
 #include <event.h>
 #include <imsg.h>
 #include <stdio.h>

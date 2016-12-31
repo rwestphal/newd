@@ -23,6 +23,8 @@
 #include <sys/uio.h>
 #include <sys/un.h>
 
+#include <netinet/in.h>
+
 #include <errno.h>
 #include <event.h>
 #include <imsg.h>
