@@ -19,9 +19,11 @@
 
 #include <sys/types.h>
 #include <sys/queue.h>
+#include <sys/socket.h>
 #include <sys/uio.h>
 
 #include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include <event.h>
 #include <imsg.h>
@@ -32,7 +34,52 @@
 void
 print_config(struct newd_conf *conf)
 {
-	printf("\n");
-	printf("newd config");
-	printf("\n");
+	char buf[100], *bufp;
+
+	printf("csock %s\n", conf->csock);
+
+	if (conf->opts == 0) {
+		printf("<no opt set>\n");
+	} else {
+		if (conf->opts & OPT_VERBOSE)
+			printf("VERBOSE ");
+		if (conf->opts & OPT_VERBOSE2)
+			printf("VERBOSE2 ");
+		if (conf->opts & OPT_NOACTION)
+			printf("NOACTION ");
+		printf("\n");
+	}
+
+	printf("yesno-attribute %s\n",
+	    conf->yesno_attribute ? "yes" : "no");
+	printf("global-yesno_attribute %s\n",
+	    conf->global_yesno_attribute ? "yes" : "no");
+
+	printf("integer-attribute %d", conf->integer_attribute);
+	printf("global-integer-attribute %d", conf->global_integer_attribute);
+
+	bufp = inet_net_ntop(AF_INET, &conf->v4address_attribute,
+	    conf->v4_bits, buf, sizeof(buf));
+	if (bufp != NULL)
+		printf("v4address-attribute %s", bufp);
+	bufp = inet_net_ntop(AF_INET, &conf->global_v4address_attribute,
+	    conf->global_v4_bits, buf, sizeof(buf));
+	if (bufp != NULL)
+		printf("global-v4address-attribute %s", bufp);
+
+	bufp = inet_net_ntop(AF_INET6, &conf->v6address_attribute,
+	    conf->v6_bits, buf, sizeof(buf));
+	if (bufp != NULL)
+		printf("v6address-attribute %s", bufp);
+	bufp = inet_net_ntop(AF_INET6, &conf->global_v6address_attribute,
+	    conf->global_v6_bits, buf, sizeof(buf));
+	if (bufp != NULL)
+		printf("global-v6address-attribute %s", bufp);
+
+	if (conf->string_attribute != NULL)
+		printf("string_attribute %s\n", conf->string_attribute);
+	if (conf->global_string_attribute != NULL)
+		printf("global_string_attribute %s\n",
+		    conf->global_string_attribute);
+
 }
