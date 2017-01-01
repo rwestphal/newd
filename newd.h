@@ -22,11 +22,6 @@
 #define	NEWD_SOCKET		"/var/run/newd.sock"
 #define NEWD_USER		"_newd"
 
-#define	READ_BUF_SIZE		65535
-#define	PKG_DEF_SIZE		512	/* compromise */
-#define	RT_BUF_SIZE		16384
-#define	MAX_RTSOCK_BUF		128 * 1024
-
 static const char * const log_procnames[] = {
 	"main",
 	"frontend",

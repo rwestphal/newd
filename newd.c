@@ -143,9 +143,10 @@ main(int argc, char *argv[])
 	if (argc > 0)
 		usage();
 
-	/* Validate system environment. e.g. appropriate sysctl settings. */
-
-	/* Fetch required system information. */
+	/*
+	 * Check system environment (e.g. appropriate sysctl settings) and
+	 * save anything required for future operations.
+	 */
 
 	/* parse config file */
 	if ((main_conf = parse_config(conffile, opts)) == NULL) {

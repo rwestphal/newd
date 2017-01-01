@@ -79,10 +79,11 @@ struct sym {
 	char			*nam;
 	char			*val;
 };
-int		 symset(const char *, const char *, int);
-char		*symget(const char *);
 
-void		 clear_config(struct newd_conf *xconf);
+int	 symset(const char *, const char *, int);
+char	*symget(const char *);
+
+void	 clear_config(struct newd_conf *xconf);
 
 static struct newd_conf	*conf;
 static int		 errors = 0;
@@ -715,8 +716,8 @@ parse_config(char *filename, int opts)
 		fatal("parse_config");
 	conf->opts = opts;
 
-	if ((file = pushfile(filename, !(conf->opts & OPT_NOACTION)))
-	    == NULL) {
+	file = pushfile(filename, !(conf->opts & OPT_NOACTION));
+	if (file == NULL) {
 		free(conf);
 		return (NULL);
 	}
@@ -866,8 +867,13 @@ clear_config(struct newd_conf *xconf)
 	while ((g = LIST_FIRST(&xconf->group_list)) != NULL) {
 		LIST_REMOVE(g, entry);
 		free(g->name);
+		free(g->string_attribute);
+		free(g->group_string_attribute);
 		free(g);
 	}
 
+	free(xconf->csock);
+	free(xconf->global_string_attribute);
+	free(xconf->string_attribute);
 	free(xconf);
 }

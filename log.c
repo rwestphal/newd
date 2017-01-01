@@ -1,4 +1,4 @@
-/*	$OpenBSD$*/
+/*	$OpenBSD$	*/
 
 /*
  * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
