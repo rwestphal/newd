@@ -236,9 +236,11 @@ conf_main	: V4ADDRESS STRING {
 			conf->global_integer = $2;
 		}
 		| TEXT STRING {
+			free(conf->text);
 			conf->text = $2;
 		}
 		| GLOBAL_TEXT STRING {
+			free(conf->global_text);
 			conf->global_text = $2;
 		}
 
@@ -317,9 +319,11 @@ groupoptsl	: V4ADDRESS STRING {
 			group->group_integer = $2;
 		}
 		| TEXT STRING {
+			free(group->text);
 			group->text = $2;
 		}
 		| GROUP_TEXT STRING {
+			free(group->group_text);
 			group->group_text = $2;
 		}
 		;
@@ -837,8 +841,11 @@ conf_get_group(char *name)
 	/* Inherit attributes set in global section. */
 	g->yesno = conf->yesno;
 	g->integer = conf->integer;
-	if (conf->text != NULL)
-		g->text = conf->text;
+	if (conf->text != NULL) {
+		g->text = strdup(conf->text);
+		if (g->text == NULL)
+			errx(1, "get_group: strdup");
+	}
 	memcpy(&g->v4address, &conf->v4address, sizeof(g->v4address));
 	g->v4_bits = conf->v4_bits;
 	memcpy(&g->v6address, &conf->v6address, sizeof(g->v6address));
