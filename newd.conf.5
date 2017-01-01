@@ -71,17 +71,17 @@ in the global configuration section. These are
 .Pp
 .Bl -tag -width Ds -compact
 .It Xo
-.Ic global-yesno-attribute
+.Ic global-yesno
 .Pq Ic yes Ns | Ns Ic no
 .Xc
 .Pp
-.It Ic global-integer-attribute Ar integer
+.It Ic global-integer Ar integer
 .Pp
-.It Ic global-v4address-attribute Ar IPv4address
+.It Ic global-v4address Ar IPv4address
 .Pp
-.It Ic global-v6address-attribute Ar IPv6address
+.It Ic global-v6address Ar IPv6address
 .Pp
-.It Ic global-string-attribute Ar string
+.It Ic global-text Ar string
 .El
 .Sh GROUPS
 A group is a named list of attributes, specified with
@@ -95,17 +95,17 @@ prefix can be used only a group. These are
 .Pp
 .Bl -tag -width Ds -compact
 .It Xo
-.Ic group-yesno-attribute
+.Ic group-yesno
 .Pq Ic yes Ns | Ns Ic no
 .Xc
 .Pp
-.It Ic group-integer-attribute Ar integer
+.It Ic group-integer Ar integer
 .Pp
-.It Ic group-v4address-attribute Ar IPv4address
+.It Ic group-v4address Ar IPv4address
 .Pp
-.It Ic group-v6address-attribute Ar IPv6address
+.It Ic group-v6address Ar IPv6address
 .Pp
-.It Ic group-string-attribute Ar string
+.It Ic group-text Ar string
 .El
 .Sh COMMON ATTRIBUTES
 Attributes with neither
@@ -121,28 +121,28 @@ precedence in that group.
 .Pp
 .Bl -tag -width Ds -compact
 .It Xo
-.Ic yesno-attribute
+.Ic yesno
 .Pq Ic yes Ns | Ns Ic no
 .Xc
 .Pp
-.It Ic integer-attribute Ar integer
+.It Ic integer Ar integer
 .Pp
-.It Ic v4address-attribute Ar IPv4address
+.It Ic v4address Ar IPv4address
 .Pp
-.It Ic v6address-attribute Ar IPv6address
+.It Ic v6address Ar IPv6address
 .Pp
-.It Ic string-attribute Ar string
+.It Ic string Ar string
 .El
 .Sh EXAMPLE
 .Bd -literal -offset indent
 include "/etc/newd.sub.conf"
 hi="5"
-global-integer-attribute=$hi
-yesno-attribute no;
+global-integer=$hi
+yesno no;
 group Barrymore {
-	yesno-attribute yes;
-	group-string-attribute "Sparks";
-	group-integer-attribute $hi;
+	yesno yes;
+	group-text "Sparks";
+	group-integer $hi;
 }
 .Ed
 .Sh FILES

@@ -1,33 +1,33 @@
-global-yesno-attribute yes
-global-integer-attribute 42
-global-v4address-attribute 1.2.3.4/10
-global-v6address-attribute 1::1/57
-global-string-attribute "Thanks for all the herring"
+global-yesno yes
+global-integer 42
+global-v4address 1.2.3.4/10
+global-v6address 1::1/57
+global-text "Thanks for all the herring"
 
-yesno-attribute no
-integer-attribute 24
-v4address-attribute 4.3.2.1/32
-v6address-attribute 2::1
-string-attribute "Happy Daemoning!"
+yesno no
+integer 24
+v4address 4.3.2.1/32
+v6address 2::1
+text "Happy Daemoning!"
 
 group Starbucks {
-	group-yesno-attribute yes
-	group-integer-attribute 42
-	group-v4address-attribute 1.2.3.4/32
-	group-v6address-attribute 1::1
-	group-string-attribute "Thanks for all the herring"
+	group-yesno yes
+	group-integer 42
+	group-v4address 1.2.3.4/32
+	group-v6address 1::1
+	group-text "Thanks for all the herring"
 }
 
 group Timmys {
-	group-yesno-attribute no
-	group-integer-attribute 234
-	group-v4address-attribute 8.8.8.8/32
-	group-v6address-attribute 8::8
-	group-string-attribute "Thanks for all the donuts"
+	group-yesno no
+	group-integer 234
+	group-v4address 8.8.8.8/32
+	group-v6address 8::8
+	group-text "Thanks for all the donuts"
 
-	yesno-attribute yes
-	integer-attribute 1
-	v4address-attribute 5.5.5.5
-	v6address-attribute 2::5
-	string-attribute "Steeped!"
+	yesno yes
+	integer 1
+	v4address 5.5.5.5
+	v6address 2::5
+	text "Steeped!"
 }

@@ -39,65 +39,54 @@ print_config(struct newd_conf *conf)
 
 	printf("csock %s\n", conf->csock);
 
-	printf("yesno-attribute %s\n",
-	    conf->yesno_attribute ? "yes" : "no");
-	printf("integer-attribute %d\n", conf->integer_attribute);
-	printf("string_attribute \"%s\"\n",
-	    conf->string_attribute ? conf->string_attribute : "");
-	bufp = inet_net_ntop(AF_INET, &conf->v4address_attribute,
-	    conf->v4_bits, buf, sizeof(buf));
-	printf("v4address-attribute %s\n", bufp ? bufp : "0.0.0.0/0");
-	bufp = inet_net_ntop(AF_INET6, &conf->v6address_attribute,
-	    conf->v6_bits, buf, sizeof(buf));
-	printf("v6address-attribute %s\n", bufp ? bufp : "::0/0");
+	printf("yesno %s\n", conf->yesno ? "yes" : "no");
+	printf("integer %d\n", conf->integer);
+	printf("text \"%s\"\n", conf->text ? conf->text : "");
+	bufp = inet_net_ntop(AF_INET, &conf->v4address, conf->v4_bits, buf,
+	    sizeof(buf));
+	printf("v4address %s\n", bufp ? bufp : "0.0.0.0/0");
+	bufp = inet_net_ntop(AF_INET6, &conf->v6address, conf->v6_bits, buf,
+	    sizeof(buf));
+	printf("v6address %s\n", bufp ? bufp : "::0/0");
 	printf("\n");
 
-	printf("global-yesno_attribute %s\n",
-	    conf->global_yesno_attribute ? "yes" : "no");
-	printf("global-integer-attribute %d\n",
-	    conf->global_integer_attribute);
-	printf("global_string_attribute \"%s\"\n",
-	    conf->global_string_attribute ? conf->global_string_attribute : "");
-	bufp = inet_net_ntop(AF_INET, &conf->global_v4address_attribute,
+	printf("global-yesno %s\n", conf->global_yesno ? "yes" : "no");
+	printf("global-integer %d\n", conf->global_integer);
+	printf("global_text \"%s\"\n",
+	    conf->global_text ? conf->global_text : "");
+	bufp = inet_net_ntop(AF_INET, &conf->global_v4address,
 	    conf->global_v4_bits, buf, sizeof(buf));
-	printf("global-v4address-attribute %s\n", bufp ? bufp : "0.0.0.0/0");
-	bufp = inet_net_ntop(AF_INET6, &conf->global_v6address_attribute,
+	printf("global-v4address %s\n", bufp ? bufp : "0.0.0.0/0");
+	bufp = inet_net_ntop(AF_INET6, &conf->global_v6address,
 	    conf->global_v6_bits, buf, sizeof(buf));
-	printf("global-v6address-attribute %s\n", bufp ? bufp : "::0/0");
+	printf("global-v6address %s\n", bufp ? bufp : "::0/0");
 	printf("\n");
 
 
 	LIST_FOREACH(g, &conf->group_list, entry) {
 		printf("group %s {\n", g->name);
 
-		printf("\tyesno-attribute %s\n",
-		    g->yesno_attribute ? "yes" : "no");
-		printf("\tinteger-attribute %d\n", g->integer_attribute);
-		printf("\tstring_attribute \"%s\"\n",
-		    g->string_attribute ? g->string_attribute : "");
-		bufp = inet_net_ntop(AF_INET, &g->v4address_attribute,
+		printf("\tyesno %s\n", g->yesno ? "yes" : "no");
+		printf("\tinteger %d\n", g->integer);
+		printf("\ttext \"%s\"\n", g->text ? g->text : "");
+		bufp = inet_net_ntop(AF_INET, &g->v4address,
 		    g->v4_bits, buf, sizeof(buf));
-		printf("\tv4address-attribute %s\n",
-		    bufp ? bufp : "0.0.0.0/0");
-		bufp = inet_net_ntop(AF_INET6, &g->v6address_attribute,
-		    g->v6_bits, buf, sizeof(buf));
-		printf("\tv6address-attribute %s\n", bufp ? bufp : "::0/0");
+		printf("\tv4address %s\n", bufp ? bufp : "0.0.0.0/0");
+		bufp = inet_net_ntop(AF_INET6, &g->v6address, g->v6_bits, buf,
+		    sizeof(buf));
+		printf("\tv6address %s\n", bufp ? bufp : "::0/0");
 		printf("\n");
 
-		printf("\tgroup-yesno_attribute %s\n",
-		    g->group_yesno_attribute ? "yes" : "no");
-		printf("\tgroup-integer-attribute %d\n",
-		    g->group_integer_attribute);
-		printf("\tgroup_string_attribute \"%s\"\n",
-		    g->group_string_attribute ? g->group_string_attribute : "");
-		bufp = inet_net_ntop(AF_INET, &g->group_v4address_attribute,
+		printf("\tgroup-yesno %s\n", g->group_yesno ? "yes" : "no");
+		printf("\tgroup-integer %d\n", g->group_integer);
+		printf("\tgroup_text \"%s\"\n",
+		    g->group_text ? g->group_text : "");
+		bufp = inet_net_ntop(AF_INET, &g->group_v4address,
 		    g->group_v4_bits, buf, sizeof(buf));
-		printf("\tgroup-v4address-attribute %s\n",
-		    bufp ? bufp : "0.0.0.0/0");
-		bufp = inet_net_ntop(AF_INET6, &g->group_v6address_attribute,
+		printf("\tgroup-v4address %s\n", bufp ? bufp : "0.0.0.0/0");
+		bufp = inet_net_ntop(AF_INET6, &g->group_v6address,
 		    g->group_v6_bits, buf, sizeof(buf));
-		printf("\tgroup-v6address-attribute %s\n",
-		    bufp ? bufp : "0.0.0.0/0");
+		printf("\tgroup-v6address %s\n", bufp ? bufp : "0.0.0.0/0");
 		if (bufp != NULL)
 
 		printf("}\n");

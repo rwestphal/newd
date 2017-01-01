@@ -53,13 +53,13 @@ enum {
 struct group {
 	LIST_ENTRY(group)	 entry;
 	char	       *name;
-	int		yesno_attribute, group_yesno_attribute;
-	int		integer_attribute, group_integer_attribute;
+	int		yesno, group_yesno;
+	int		integer, group_integer;
 	int		v4_bits, group_v4_bits;
 	int		v6_bits, group_v6_bits;
-	struct in_addr	v4address_attribute, group_v4address_attribute;
-	struct in6_addr	v6address_attribute, group_v6address_attribute;
-	char	       *string_attribute, *group_string_attribute;
+	struct in_addr	v4address, group_v4address;
+	struct in6_addr	v6address, group_v6address;
+	char	       *text, *group_text;
 };
 
 struct newd_conf {
@@ -68,13 +68,13 @@ struct newd_conf {
 #define OPT_VERBOSE	0x00000001
 #define OPT_VERBOSE2	0x00000002
 #define OPT_NOACTION	0x00000004
-	int		yesno_attribute, global_yesno_attribute;
-	int		integer_attribute, global_integer_attribute;
+	int		yesno, global_yesno;
+	int		integer, global_integer;
 	int		v4_bits, global_v4_bits;
 	int		v6_bits, global_v6_bits;
-	struct in_addr	v4address_attribute, global_v4address_attribute;
-	struct in6_addr	v6address_attribute, global_v6address_attribute;
-	char		*string_attribute, *global_string_attribute;
+	struct in_addr	v4address, global_v4address;
+	struct in6_addr	v6address, global_v6address;
+	char		*text, *global_text;
 	LIST_HEAD(, group)	group_list;
 };
 
@@ -83,8 +83,8 @@ void	main_imsg_compose_frontend(int, pid_t, void *, u_int16_t);
 void	main_imsg_compose_engine(int, pid_t, void *, u_int16_t);
 void	merge_config(struct newd_conf *, struct newd_conf *);
 void	imsg_event_add(struct imsgev *);
-int	imsg_compose_event(struct imsgev *, u_int16_t, u_int32_t,
-	    pid_t, int, void *, u_int16_t);
+int	imsg_compose_event(struct imsgev *, u_int16_t, u_int32_t, pid_t,
+	    int, void *, u_int16_t);
 
 /* printconf.c */
 void	print_config(struct newd_conf *);

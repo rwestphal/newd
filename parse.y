@@ -105,13 +105,13 @@ typedef struct {
 
 %token	GROUP YES NO INCLUDE ERROR
 
-%token	GLOBAL_YESNO_ATTRIBUTE GLOBAL_INTEGER_ATTRIBUTE GLOBAL_STRING_ATTRIBUTE
-%token	GROUP_YESNO_ATTRIBUTE GROUP_INTEGER_ATTRIBUTE GROUP_STRING_ATTRIBUTE
-%token	YESNO_ATTRIBUTE INTEGER_ATTRIBUTE STRING_ATTRIBUTE
+%token	GLOBAL_YESNO GLOBAL_INTEGER GLOBAL_TEXT
+%token	GROUP_YESNO GROUP_INTEGER GROUP_TEXT
+%token	YESNO INTEGER TEXT
 
-%token	GLOBAL_V4ADDRESS_ATTRIBUTE GLOBAL_V6ADDRESS_ATTRIBUTE
-%token	GROUP_V4ADDRESS_ATTRIBUTE GROUP_V6ADDRESS_ATTRIBUTE
-%token	V4ADDRESS_ATTRIBUTE V6ADDRESS_ATTRIBUTE
+%token	GLOBAL_V4ADDRESS GLOBAL_V6ADDRESS
+%token	GROUP_V4ADDRESS GROUP_V6ADDRESS
+%token	V4ADDRESS V6ADDRESS
 
 %token	<v.string>	STRING
 %token	<v.number>	NUMBER
@@ -179,71 +179,67 @@ varset		: STRING '=' string		{
 		}
 		;
 
-conf_main	: V4ADDRESS_ATTRIBUTE STRING {
-			memset(&conf->v4address_attribute, 0,
-			    sizeof(conf->v4address_attribute));
+conf_main	: V4ADDRESS STRING {
+			memset(&conf->v4address, 0, sizeof(conf->v4address));
 			conf->v4_bits = inet_net_pton(AF_INET, $2,
-			    &conf->v4address_attribute,
-			    sizeof(conf->v4address_attribute));
+			    &conf->v4address, sizeof(conf->v4address));
 			if (conf->v4_bits == -1) {
-				yyerror("error parsing v4address_attribute");
+				yyerror("error parsing v4address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| GLOBAL_V4ADDRESS_ATTRIBUTE STRING {
-			memset(&conf->global_v4address_attribute, 0,
-			    sizeof(conf->global_v4address_attribute));
+		| GLOBAL_V4ADDRESS STRING {
+			memset(&conf->global_v4address, 0,
+			    sizeof(conf->global_v4address));
 			conf->global_v4_bits = inet_net_pton(AF_INET, $2,
-			    &conf->global_v4address_attribute,
-			    sizeof(conf->global_v4address_attribute));
+			    &conf->global_v4address,
+			    sizeof(conf->global_v4address));
 			if (conf->global_v4_bits == -1) {
-				yyerror("error parsing global_v4address_attribute");
+				yyerror("error parsing global_v4address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| V6ADDRESS_ATTRIBUTE STRING {
-			memset(&conf->v6address_attribute, 0,
-			    sizeof(conf->v6address_attribute));
+		| V6ADDRESS STRING {
+			memset(&conf->v6address, 0, sizeof(conf->v6address));
 			conf->v6_bits = inet_net_pton(AF_INET6, $2,
-			    &conf->v6address_attribute,
-			    sizeof(conf->v6address_attribute));
+			    &conf->v6address, sizeof(conf->v6address));
 			if (conf->v6_bits == -1) {
-				yyerror("error parsing v6address_attribute");
+				yyerror("error parsing v6address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| GLOBAL_V6ADDRESS_ATTRIBUTE STRING {
-			memset(&conf->global_v6address_attribute, 0,
-			    sizeof(conf->global_v6address_attribute));
+		| GLOBAL_V6ADDRESS STRING {
+			memset(&conf->global_v6address, 0,
+			    sizeof(conf->global_v6address));
 			conf->global_v6_bits = inet_net_pton(AF_INET6, $2,
-			    &conf->global_v6address_attribute,
-			    sizeof(conf->global_v6address_attribute));
+			    &conf->global_v6address,
+			    sizeof(conf->global_v6address));
 			if (conf->global_v6_bits == -1) {
-				yyerror("error parsing global_v6address_attribute");
+				yyerror("error parsing global_v6address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| YESNO_ATTRIBUTE yesno {
-			conf->yesno_attribute = $2;
+		| YESNO yesno {
+			conf->yesno = $2;
 		}
-		| GLOBAL_YESNO_ATTRIBUTE yesno {
-			conf->global_yesno_attribute = $2;
+		| GLOBAL_YESNO yesno {
+			conf->global_yesno = $2;
 		}
-		| INTEGER_ATTRIBUTE NUMBER {
-			conf->integer_attribute = $2;
+		| INTEGER NUMBER {
+			conf->integer = $2;
 		}
-		| GLOBAL_INTEGER_ATTRIBUTE NUMBER {
-			conf->global_integer_attribute = $2;
+		| GLOBAL_INTEGER NUMBER {
+			conf->global_integer = $2;
 		}
-		| STRING_ATTRIBUTE STRING {
-			conf->string_attribute = $2;
+		| TEXT STRING {
+			conf->text = $2;
 		}
-		| GLOBAL_STRING_ATTRIBUTE STRING {
-			conf->global_string_attribute = $2;
+		| GLOBAL_TEXT STRING {
+			conf->global_text = $2;
 		}
 
 optnl		: '\n' optnl		/* zero or more newlines */
@@ -264,71 +260,67 @@ groupopts_l	: groupopts_l groupoptsl nl
 		| groupoptsl optnl
 		;
 
-groupoptsl	: V4ADDRESS_ATTRIBUTE STRING {
-			memset(&group->v4address_attribute, 0,
-			    sizeof(group->v4address_attribute));
+groupoptsl	: V4ADDRESS STRING {
+			memset(&group->v4address, 0, sizeof(group->v4address));
 			group->v4_bits = inet_net_pton(AF_INET, $2,
-			    &group->v4address_attribute,
-			    sizeof(group->v4address_attribute));
+			    &group->v4address, sizeof(group->v4address));
 			if (group->v4_bits == -1) {
-				yyerror("error parsing v4address_attribute");
+				yyerror("error parsing v4address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| GROUP_V4ADDRESS_ATTRIBUTE STRING {
-			memset(&group->group_v4address_attribute, 0,
-			    sizeof(group->group_v4address_attribute));
+		| GROUP_V4ADDRESS STRING {
+			memset(&group->group_v4address, 0,
+			    sizeof(group->group_v4address));
 			group->group_v4_bits = inet_net_pton(AF_INET, $2,
-			    &group->group_v4address_attribute,
-			    sizeof(group->group_v4address_attribute));
+			    &group->group_v4address,
+			    sizeof(group->group_v4address));
 			if (group->group_v4_bits == -1) {
-				yyerror("error parsing group_v4address_attribute");
+				yyerror("error parsing group_v4address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| V6ADDRESS_ATTRIBUTE STRING {
-			memset(&group->v6address_attribute, 0,
-			    sizeof(group->v6address_attribute));
+		| V6ADDRESS STRING {
+			memset(&group->v6address, 0, sizeof(group->v6address));
 			group->v6_bits = inet_net_pton(AF_INET6, $2,
-			    &group->v6address_attribute,
-			    sizeof(group->v6address_attribute));
+			    &group->v6address, sizeof(group->v6address));
 			if (group->v6_bits == -1) {
-				yyerror("error parsing v6address_attribute");
+				yyerror("error parsing v6address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| GROUP_V6ADDRESS_ATTRIBUTE STRING {
-			memset(&group->group_v6address_attribute, 0,
-			    sizeof(group->group_v6address_attribute));
+		| GROUP_V6ADDRESS STRING {
+			memset(&group->group_v6address, 0,
+			    sizeof(group->group_v6address));
 			group->group_v6_bits = inet_net_pton(AF_INET6, $2,
-			    &group->group_v6address_attribute,
-			    sizeof(group->group_v6address_attribute));
+			    &group->group_v6address,
+			    sizeof(group->group_v6address));
 			if (group->group_v6_bits == -1) {
-				yyerror("error parsing group_v6address_attribute");
+				yyerror("error parsing group_v6address");
 				free($2);
 				YYERROR;
 			}
 		}
-		| YESNO_ATTRIBUTE yesno {
-			group->yesno_attribute = $2;
+		| YESNO yesno {
+			group->yesno = $2;
 		}
-		| GROUP_YESNO_ATTRIBUTE yesno {
-			group->group_yesno_attribute = $2;
+		| GROUP_YESNO yesno {
+			group->group_yesno = $2;
 		}
-		| INTEGER_ATTRIBUTE NUMBER {
-			group->integer_attribute = $2;
+		| INTEGER NUMBER {
+			group->integer = $2;
 		}
-		| GROUP_INTEGER_ATTRIBUTE NUMBER {
-			group->group_integer_attribute = $2;
+		| GROUP_INTEGER NUMBER {
+			group->group_integer = $2;
 		}
-		| STRING_ATTRIBUTE STRING {
-			group->string_attribute = $2;
+		| TEXT STRING {
+			group->text = $2;
 		}
-		| GROUP_STRING_ATTRIBUTE STRING {
-			group->group_string_attribute = $2;
+		| GROUP_TEXT STRING {
+			group->group_text = $2;
 		}
 		;
 
@@ -366,25 +358,25 @@ lookup(char *s)
 {
 	/* this has to be sorted always */
 	static const struct keywords keywords[] = {
-		{"global-integer-attribute",	GLOBAL_INTEGER_ATTRIBUTE},
-		{"global-string-attribute",	GLOBAL_STRING_ATTRIBUTE},
-		{"global-v4address-attribute",	GLOBAL_V4ADDRESS_ATTRIBUTE},
-		{"global-v6address-attribute",	GLOBAL_V6ADDRESS_ATTRIBUTE},
-		{"global-yesno-attribute",	GLOBAL_YESNO_ATTRIBUTE},
-		{"group",			GROUP},
-		{"group-integer-attribute",	GROUP_INTEGER_ATTRIBUTE},
-		{"group-string-attribute",	GROUP_STRING_ATTRIBUTE},
-		{"group-v4address-attribute",	GROUP_V4ADDRESS_ATTRIBUTE},
-		{"group-v6address-attribute",	GROUP_V6ADDRESS_ATTRIBUTE},
-		{"group-yesno-attribute",	GROUP_YESNO_ATTRIBUTE},
-		{"include",			INCLUDE},
-		{"integer-attribute",		INTEGER_ATTRIBUTE},
-		{"no",				NO},
-		{"string-attribute",		STRING_ATTRIBUTE},
-		{"v4address-attribute",		V4ADDRESS_ATTRIBUTE},
-		{"v6address-attribute",		V6ADDRESS_ATTRIBUTE},
-		{"yes",				YES},
-		{"yesno-attribute",		YESNO_ATTRIBUTE}
+		{"global-integer",	GLOBAL_INTEGER},
+		{"global-text",		GLOBAL_TEXT},
+		{"global-v4address",	GLOBAL_V4ADDRESS},
+		{"global-v6address",	GLOBAL_V6ADDRESS},
+		{"global-yesno",	GLOBAL_YESNO},
+		{"group",		GROUP},
+		{"group-integer",	GROUP_INTEGER},
+		{"group-text",		GROUP_TEXT},
+		{"group-v4address",	GROUP_V4ADDRESS},
+		{"group-v6address",	GROUP_V6ADDRESS},
+		{"group-yesno",		GROUP_YESNO},
+		{"include",		INCLUDE},
+		{"integer",		INTEGER},
+		{"no",			NO},
+		{"text",		TEXT},
+		{"v4address",		V4ADDRESS},
+		{"v6address",		V6ADDRESS},
+		{"yes",			YES},
+		{"yesno",		YESNO}
 	};
 	const struct keywords	*p;
 
@@ -733,8 +725,8 @@ parse_config(char *filename, int opts)
 	for (sym = TAILQ_FIRST(&symhead); sym != NULL; sym = next) {
 		next = TAILQ_NEXT(sym, entry);
 		if ((conf->opts & OPT_VERBOSE2) && !sym->used)
-			fprintf(stderr, "warning: macro '%s' not "
-			    "used\n", sym->nam);
+			fprintf(stderr, "warning: macro '%s' not used\n",
+			    sym->nam);
 		if (!sym->persist) {
 			free(sym->nam);
 			free(sym->val);
@@ -843,15 +835,13 @@ conf_get_group(char *name)
 		errx(1, "get_group: strdup");
 
 	/* Inherit attributes set in global section. */
-	g->yesno_attribute = conf->yesno_attribute;
-	g->integer_attribute = conf->integer_attribute;
-	if (conf->string_attribute != NULL)
-		g->string_attribute = conf->string_attribute;
-	memcpy(&g->v4address_attribute, &conf->v4address_attribute,
-	    sizeof(g->v4address_attribute));
+	g->yesno = conf->yesno;
+	g->integer = conf->integer;
+	if (conf->text != NULL)
+		g->text = conf->text;
+	memcpy(&g->v4address, &conf->v4address, sizeof(g->v4address));
 	g->v4_bits = conf->v4_bits;
-	memcpy(&g->v6address_attribute, &conf->v6address_attribute,
-	    sizeof(g->v6address_attribute));
+	memcpy(&g->v6address, &conf->v6address, sizeof(g->v6address));
 	g->v6_bits = conf->v6_bits;
 
 	LIST_INSERT_HEAD(&conf->group_list, g, entry);
@@ -867,13 +857,13 @@ clear_config(struct newd_conf *xconf)
 	while ((g = LIST_FIRST(&xconf->group_list)) != NULL) {
 		LIST_REMOVE(g, entry);
 		free(g->name);
-		free(g->string_attribute);
-		free(g->group_string_attribute);
+		free(g->text);
+		free(g->group_text);
 		free(g);
 	}
 
 	free(xconf->csock);
-	free(xconf->global_string_attribute);
-	free(xconf->string_attribute);
+	free(xconf->text);
+	free(xconf->global_text);
 	free(xconf);
 }
