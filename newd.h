@@ -22,6 +22,9 @@
 #define	NEWD_SOCKET		"/var/run/newd.sock"
 #define NEWD_USER		"_newd"
 
+#define NEWD_MAXTEXT		256
+#define NEWD_MAXGROUPNAME	16
+
 static const char * const log_procnames[] = {
 	"main",
 	"frontend",
@@ -52,14 +55,15 @@ enum {
 
 struct group {
 	LIST_ENTRY(group)	 entry;
-	char	       *name;
+	char		name[NEWD_MAXGROUPNAME];
 	int		yesno, group_yesno;
 	int		integer, group_integer;
 	int		v4_bits, group_v4_bits;
 	int		v6_bits, group_v6_bits;
 	struct in_addr	v4address, group_v4address;
 	struct in6_addr	v6address, group_v6address;
-	char	       *text, *group_text;
+	char		text[NEWD_MAXTEXT];
+	char		group_text[NEWD_MAXTEXT];
 };
 
 struct newd_conf {
@@ -74,7 +78,8 @@ struct newd_conf {
 	int		v6_bits, global_v6_bits;
 	struct in_addr	v4address, global_v4address;
 	struct in6_addr	v6address, global_v6address;
-	char		*text, *global_text;
+	char		text[NEWD_MAXTEXT];
+	char		global_text[NEWD_MAXTEXT];
 	LIST_HEAD(, group)	group_list;
 };
 

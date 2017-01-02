@@ -236,12 +236,26 @@ conf_main	: V4ADDRESS STRING {
 			conf->global_integer = $2;
 		}
 		| TEXT STRING {
-			free(conf->text);
-			conf->text = $2;
+			size_t n;
+			memset(conf->text, 0, sizeof(conf->text));
+			n = strlcpy(conf->text, $2, sizeof(conf->text));
+			if (n >= sizeof(conf->text)) {
+				yyerror("error parsing text: too long");
+				free($2);
+				YYERROR;
+			}
 		}
 		| GLOBAL_TEXT STRING {
-			free(conf->global_text);
-			conf->global_text = $2;
+			size_t n;
+			memset(conf->global_text, 0,
+			    sizeof(conf->global_text));
+			n = strlcpy(conf->global_text, $2,
+			    sizeof(conf->global_text));
+			if (n >= sizeof(conf->global_text)) {
+				yyerror("error parsing global_text: too long");
+				free($2);
+				YYERROR;
+			}
 		}
 
 optnl		: '\n' optnl		/* zero or more newlines */
@@ -319,12 +333,26 @@ groupoptsl	: V4ADDRESS STRING {
 			group->group_integer = $2;
 		}
 		| TEXT STRING {
-			free(group->text);
-			group->text = $2;
+			size_t n;
+			memset(group->text, 0, sizeof(group->text));
+			n = strlcpy(group->text, $2, sizeof(group->text));
+			if (n >= sizeof(group->text)) {
+				yyerror("error parsing text: too long");
+				free($2);
+				YYERROR;
+			}
 		}
 		| GROUP_TEXT STRING {
-			free(group->group_text);
-			group->group_text = $2;
+			size_t n;
+			memset(group->group_text, 0,
+			    sizeof(group->group_text));
+			n = strlcpy(group->group_text, $2,
+			    sizeof(group->group_text));
+			if (n >= sizeof(group->group_text)) {
+				yyerror("error parsing group_text: too long");
+				free($2);
+				YYERROR;
+			}
 		}
 		;
 
@@ -825,31 +853,29 @@ struct group *
 conf_get_group(char *name)
 {
 	struct group	*g;
+	size_t		n;
 
 	LIST_FOREACH(g, &conf->group_list, entry) {
-		if (g->name != NULL && strcmp(name, g->name)== 0)
+		if (strcmp(name, g->name) == 0)
 			return (g);
 	}
 
 	g = calloc(1, sizeof(*g));
 	if (g == NULL)
 		errx(1, "get_group: calloc");
-	g->name = strdup(name);
-	if (g->name == NULL)
-		errx(1, "get_group: strdup");
+	n = strlcpy(g->name, name, sizeof(g->name));
+	if (n >= sizeof(g->name))
+		errx(1, "get_group: name too long");
 
 	/* Inherit attributes set in global section. */
 	g->yesno = conf->yesno;
 	g->integer = conf->integer;
-	if (conf->text != NULL) {
-		g->text = strdup(conf->text);
-		if (g->text == NULL)
-			errx(1, "get_group: strdup");
-	}
-	memcpy(&g->v4address, &conf->v4address, sizeof(g->v4address));
 	g->v4_bits = conf->v4_bits;
-	memcpy(&g->v6address, &conf->v6address, sizeof(g->v6address));
 	g->v6_bits = conf->v6_bits;
+
+	memcpy(g->text, conf->text, sizeof(g->text));
+	memcpy(&g->v4address, &conf->v4address, sizeof(g->v4address));
+	memcpy(&g->v6address, &conf->v6address, sizeof(g->v6address));
 
 	LIST_INSERT_HEAD(&conf->group_list, g, entry);
 
