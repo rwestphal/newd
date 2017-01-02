@@ -90,4 +90,3 @@ void	print_config(struct newd_conf *);
 /* parse.y */
 struct newd_conf	*parse_config(char *, int);
 int			 cmdline_symset(char *);
-
