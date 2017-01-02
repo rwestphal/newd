@@ -70,17 +70,6 @@ prefix can be used
 in the global configuration section. These are
 .Pp
 .Bl -tag -width Ds -compact
-.It Xo
-.Ic global-yesno
-.Pq Ic yes Ns | Ns Ic no
-.Xc
-.Pp
-.It Ic global-integer Ar integer
-.Pp
-.It Ic global-v4address Ar IPv4address
-.Pp
-.It Ic global-v6address Ar IPv6address
-.Pp
 .It Ic global-text Ar string
 .El
 .Sh GROUPS
@@ -94,18 +83,9 @@ Attibutes with the
 prefix can be used only a group. These are
 .Pp
 .Bl -tag -width Ds -compact
-.It Xo
-.Ic group-yesno
-.Pq Ic yes Ns | Ns Ic no
-.Xc
-.Pp
-.It Ic group-integer Ar integer
-.Pp
 .It Ic group-v4address Ar IPv4address
 .Pp
 .It Ic group-v6address Ar IPv6address
-.Pp
-.It Ic group-text Ar string
 .El
 .Sh COMMON ATTRIBUTES
 Attributes with neither
@@ -119,6 +99,8 @@ inherited by all groups.
 If used in both the sections, the specification in the group will take
 precedence in that group.
 .Pp
+These are
+.Pp
 .Bl -tag -width Ds -compact
 .It Xo
 .Ic yesno
@@ -126,23 +108,17 @@ precedence in that group.
 .Xc
 .Pp
 .It Ic integer Ar integer
-.Pp
-.It Ic v4address Ar IPv4address
-.Pp
-.It Ic v6address Ar IPv6address
-.Pp
-.It Ic string Ar string
 .El
 .Sh EXAMPLE
 .Bd -literal -offset indent
 include "/etc/newd.sub.conf"
 hi="5"
-global-integer=$hi
+integer=$hi
 yesno no;
 group Barrymore {
 	yesno yes;
-	group-text "Sparks";
-	group-integer $hi;
+	integer 1;
+	group-v4address 1.2.3.4/32;
 }
 .Ed
 .Sh FILES

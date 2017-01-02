@@ -104,14 +104,9 @@ typedef struct {
 %}
 
 %token	GROUP YES NO INCLUDE ERROR
-
-%token	GLOBAL_YESNO GLOBAL_INTEGER GLOBAL_TEXT
-%token	GROUP_YESNO GROUP_INTEGER GROUP_TEXT
-%token	YESNO INTEGER TEXT
-
-%token	GLOBAL_V4ADDRESS GLOBAL_V6ADDRESS
+%token	YESNO INTEGER
+%token	GLOBAL_TEXT
 %token	GROUP_V4ADDRESS GROUP_V6ADDRESS
-%token	V4ADDRESS V6ADDRESS
 
 %token	<v.string>	STRING
 %token	<v.number>	NUMBER
@@ -179,71 +174,11 @@ varset		: STRING '=' string		{
 		}
 		;
 
-conf_main	: V4ADDRESS STRING {
-			memset(&conf->v4address, 0, sizeof(conf->v4address));
-			conf->v4_bits = inet_net_pton(AF_INET, $2,
-			    &conf->v4address, sizeof(conf->v4address));
-			if (conf->v4_bits == -1) {
-				yyerror("error parsing v4address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| GLOBAL_V4ADDRESS STRING {
-			memset(&conf->global_v4address, 0,
-			    sizeof(conf->global_v4address));
-			conf->global_v4_bits = inet_net_pton(AF_INET, $2,
-			    &conf->global_v4address,
-			    sizeof(conf->global_v4address));
-			if (conf->global_v4_bits == -1) {
-				yyerror("error parsing global_v4address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| V6ADDRESS STRING {
-			memset(&conf->v6address, 0, sizeof(conf->v6address));
-			conf->v6_bits = inet_net_pton(AF_INET6, $2,
-			    &conf->v6address, sizeof(conf->v6address));
-			if (conf->v6_bits == -1) {
-				yyerror("error parsing v6address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| GLOBAL_V6ADDRESS STRING {
-			memset(&conf->global_v6address, 0,
-			    sizeof(conf->global_v6address));
-			conf->global_v6_bits = inet_net_pton(AF_INET6, $2,
-			    &conf->global_v6address,
-			    sizeof(conf->global_v6address));
-			if (conf->global_v6_bits == -1) {
-				yyerror("error parsing global_v6address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| YESNO yesno {
+conf_main	: YESNO yesno {
 			conf->yesno = $2;
-		}
-		| GLOBAL_YESNO yesno {
-			conf->global_yesno = $2;
 		}
 		| INTEGER NUMBER {
 			conf->integer = $2;
-		}
-		| GLOBAL_INTEGER NUMBER {
-			conf->global_integer = $2;
-		}
-		| TEXT STRING {
-			size_t n;
-			memset(conf->text, 0, sizeof(conf->text));
-			n = strlcpy(conf->text, $2, sizeof(conf->text));
-			if (n >= sizeof(conf->text)) {
-				yyerror("error parsing text: too long");
-				free($2);
-				YYERROR;
-			}
 		}
 		| GLOBAL_TEXT STRING {
 			size_t n;
@@ -276,17 +211,7 @@ groupopts_l	: groupopts_l groupoptsl nl
 		| groupoptsl optnl
 		;
 
-groupoptsl	: V4ADDRESS STRING {
-			memset(&group->v4address, 0, sizeof(group->v4address));
-			group->v4_bits = inet_net_pton(AF_INET, $2,
-			    &group->v4address, sizeof(group->v4address));
-			if (group->v4_bits == -1) {
-				yyerror("error parsing v4address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| GROUP_V4ADDRESS STRING {
+groupoptsl	: GROUP_V4ADDRESS STRING {
 			memset(&group->group_v4address, 0,
 			    sizeof(group->group_v4address));
 			group->group_v4_bits = inet_net_pton(AF_INET, $2,
@@ -294,16 +219,6 @@ groupoptsl	: V4ADDRESS STRING {
 			    sizeof(group->group_v4address));
 			if (group->group_v4_bits == -1) {
 				yyerror("error parsing group_v4address");
-				free($2);
-				YYERROR;
-			}
-		}
-		| V6ADDRESS STRING {
-			memset(&group->v6address, 0, sizeof(group->v6address));
-			group->v6_bits = inet_net_pton(AF_INET6, $2,
-			    &group->v6address, sizeof(group->v6address));
-			if (group->v6_bits == -1) {
-				yyerror("error parsing v6address");
 				free($2);
 				YYERROR;
 			}
@@ -323,36 +238,8 @@ groupoptsl	: V4ADDRESS STRING {
 		| YESNO yesno {
 			group->yesno = $2;
 		}
-		| GROUP_YESNO yesno {
-			group->group_yesno = $2;
-		}
 		| INTEGER NUMBER {
 			group->integer = $2;
-		}
-		| GROUP_INTEGER NUMBER {
-			group->group_integer = $2;
-		}
-		| TEXT STRING {
-			size_t n;
-			memset(group->text, 0, sizeof(group->text));
-			n = strlcpy(group->text, $2, sizeof(group->text));
-			if (n >= sizeof(group->text)) {
-				yyerror("error parsing text: too long");
-				free($2);
-				YYERROR;
-			}
-		}
-		| GROUP_TEXT STRING {
-			size_t n;
-			memset(group->group_text, 0,
-			    sizeof(group->group_text));
-			n = strlcpy(group->group_text, $2,
-			    sizeof(group->group_text));
-			if (n >= sizeof(group->group_text)) {
-				yyerror("error parsing group_text: too long");
-				free($2);
-				YYERROR;
-			}
 		}
 		;
 
@@ -390,23 +277,13 @@ lookup(char *s)
 {
 	/* this has to be sorted always */
 	static const struct keywords keywords[] = {
-		{"global-integer",	GLOBAL_INTEGER},
 		{"global-text",		GLOBAL_TEXT},
-		{"global-v4address",	GLOBAL_V4ADDRESS},
-		{"global-v6address",	GLOBAL_V6ADDRESS},
-		{"global-yesno",	GLOBAL_YESNO},
 		{"group",		GROUP},
-		{"group-integer",	GROUP_INTEGER},
-		{"group-text",		GROUP_TEXT},
 		{"group-v4address",	GROUP_V4ADDRESS},
 		{"group-v6address",	GROUP_V6ADDRESS},
-		{"group-yesno",		GROUP_YESNO},
 		{"include",		INCLUDE},
 		{"integer",		INTEGER},
 		{"no",			NO},
-		{"text",		TEXT},
-		{"v4address",		V4ADDRESS},
-		{"v6address",		V6ADDRESS},
 		{"yes",			YES},
 		{"yesno",		YESNO}
 	};
@@ -870,12 +747,6 @@ conf_get_group(char *name)
 	/* Inherit attributes set in global section. */
 	g->yesno = conf->yesno;
 	g->integer = conf->integer;
-	g->v4_bits = conf->v4_bits;
-	g->v6_bits = conf->v6_bits;
-
-	memcpy(g->text, conf->text, sizeof(g->text));
-	memcpy(&g->v4address, &conf->v4address, sizeof(g->v4address));
-	memcpy(&g->v6address, &conf->v6address, sizeof(g->v6address));
 
 	LIST_INSERT_HEAD(&conf->group_list, g, entry);
 
@@ -889,14 +760,9 @@ clear_config(struct newd_conf *xconf)
 
 	while ((g = LIST_FIRST(&xconf->group_list)) != NULL) {
 		LIST_REMOVE(g, entry);
-		free(g->name);
-		free(g->text);
-		free(g->group_text);
 		free(g);
 	}
 
 	free(xconf->csock);
-	free(xconf->text);
-	free(xconf->global_text);
 	free(xconf);
 }

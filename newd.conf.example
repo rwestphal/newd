@@ -1,33 +1,18 @@
-global-yesno yes
-global-integer 42
-global-v4address 1.2.3.4/10
-global-v6address 1::1/57
 global-text "Thanks for all the herring"
 
 yesno no
 integer 24
-v4address 4.3.2.1/32
-v6address 2::1
-text "Happy Daemoning!"
 
 group Starbucks {
-	group-yesno yes
-	group-integer 42
 	group-v4address 1.2.3.4/32
 	group-v6address 1::1
-	group-text "Thanks for all the herring"
 }
 
 group Timmys {
-	group-yesno no
-	group-integer 234
-	group-v4address 8.8.8.8/32
-	group-v6address 8::8
-	group-text "Thanks for all the donuts"
-
 	yesno yes
 	integer 1
-	v4address 5.5.5.5
-	v6address 2::5
-	text "Steeped!"
+
+	group-v4address 8.8.8.8/32
+	group-v6address 8::8
+
 }
