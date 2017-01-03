@@ -227,6 +227,7 @@ frontend_dispatch_main(int fd, short event, void *bula)
 			    NULL)
 				fatal(NULL);
 			memcpy(nconf, imsg.data, sizeof(struct newd_conf));
+			LIST_INIT(&nconf->group_list);
 			break;
 		case IMSG_RECONF_END:
 			merge_config(frontend_conf, nconf);
