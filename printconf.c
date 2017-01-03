@@ -59,7 +59,6 @@ print_config(struct newd_conf *conf)
 		bufp = inet_net_ntop(AF_INET6, &g->group_v6address,
 		    g->group_v6_bits, buf, sizeof(buf));
 		printf("\tgroup-v6address %s\n", bufp ? bufp : "0.0.0.0/0");
-		if (bufp != NULL)
 
 		printf("}\n");
 	}
