@@ -326,8 +326,6 @@ main_dispatch_frontend(int fd, short event, void *bula)
 			break;
 		case IMSG_CTL_SHOW_MAIN_INFO:
 			main_showinfo_ctl(&imsg);
-			main_imsg_compose_frontend(IMSG_CTL_END, imsg.hdr.pid,
-			    NULL, 0);
 			break;
 		default:
 			log_debug("main_dispatch_frontend: error handling "
@@ -481,6 +479,15 @@ main_showinfo_ctl(struct imsg *imsg)
 			log_debug("main_showinfo_ctl: I was cut off!");
 		main_imsg_compose_frontend(IMSG_CTL_SHOW_MAIN_INFO,
 		    imsg->hdr.pid, &cmi, sizeof(cmi));
+		memset(cmi.text, 0, sizeof(cmi.text));
+		n = strlcpy(cmi.text, "Full of sencha.",
+		    sizeof(cmi.text));
+		if (n >= sizeof(cmi.text))
+			log_debug("main_showinfo_ctl: I was cut off!");
+		main_imsg_compose_frontend(IMSG_CTL_SHOW_MAIN_INFO,
+		    imsg->hdr.pid, &cmi, sizeof(cmi));
+		main_imsg_compose_frontend(IMSG_CTL_END, imsg->hdr.pid, NULL,
+		    0);
 		break;
 	default:
 		log_debug("main_showinfo_ctl: error handling imsg");

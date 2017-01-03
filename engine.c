@@ -219,8 +219,6 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 			break;
 		case IMSG_CTL_SHOW_ENGINE_INFO:
 			engine_showinfo_ctl(&imsg);
-			engine_imsg_compose_frontend(IMSG_CTL_END,
-			    imsg.hdr.pid, NULL, 0);
 			break;
 		default:
 			log_debug("engine_dispatch_frontend: unexpected "
@@ -308,7 +306,7 @@ engine_showinfo_ctl(struct imsg *imsg)
 		memcpy(filter, imsg->data, sizeof(filter));
 		LIST_FOREACH(g, &engine_conf->group_list, entry) {
 			if (filter[0] == '\0' || memcmp(filter, g->name,
-			    sizeof(filter))) {
+			    sizeof(filter)) == 0) {
 				memcpy(cei.name, g->name, sizeof(cei.name));
 				cei.yesno = g->yesno;
 				cei.integer = g->integer;
@@ -326,6 +324,8 @@ engine_showinfo_ctl(struct imsg *imsg)
 				    &cei, sizeof(cei));
 			}
 		}
+		engine_imsg_compose_frontend(IMSG_CTL_END, imsg->hdr.pid, NULL,
+		    0);
 		break;
 	default:
 		log_debug("engine_showinfo_ctl: error handling imsg");

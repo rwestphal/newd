@@ -232,6 +232,7 @@ frontend_dispatch_main(int fd, short event, void *bula)
 			merge_config(frontend_conf, nconf);
 			nconf = NULL;
 			break;
+		case IMSG_CTL_END:
 		case IMSG_CTL_SHOW_MAIN_INFO:
 			control_imsg_relay(&imsg);
 			break;
@@ -280,6 +281,7 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 			break;
 
 		switch (imsg.hdr.type) {
+		case IMSG_CTL_END:
 		case IMSG_CTL_SHOW_ENGINE_INFO:
 			control_imsg_relay(&imsg);
 			break;
