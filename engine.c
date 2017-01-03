@@ -241,6 +241,7 @@ void
 engine_dispatch_main(int fd, short event, void *bula)
 {
 	struct imsg		 imsg;
+	struct group		*g;
 	struct imsgev		*iev = bula;
 	struct imsgbuf		*ibuf;
 	ssize_t			 n;
@@ -274,6 +275,12 @@ engine_dispatch_main(int fd, short event, void *bula)
 				fatal(NULL);
 			memcpy(nconf, imsg.data, sizeof(struct newd_conf));
 			LIST_INIT(&nconf->group_list);
+			break;
+		case IMSG_RECONF_GROUP:
+			if ((g = malloc(sizeof(struct group))) == NULL)
+				fatal(NULL);
+			memcpy(g, imsg.data, sizeof(struct group));
+			LIST_INSERT_HEAD(&nconf->group_list, g, entry);
 			break;
 		case IMSG_RECONF_END:
 			merge_config(engine_conf, nconf);

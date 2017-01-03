@@ -436,15 +436,20 @@ int
 main_reload(void)
 {
 	struct newd_conf *xconf;
+	struct group	 *g;
 
 	if ((xconf = parse_config(conffile, main_conf->opts)) == NULL)
 		return (-1);
 
-	/* Tell children a revised config is being sent. */
+	/* Send fixed part of config to children. */
 	if (main_sendboth(IMSG_RECONF_CONF, xconf, sizeof(*xconf)) == -1)
 		return (-1);
 
-	/* Send further revised config details to children. */
+	/* Send the group list to children. */
+	LIST_FOREACH(g, &xconf->group_list, entry) {
+		if (main_sendboth(IMSG_RECONF_GROUP, g, sizeof(*g)) == -1)
+			return (-1);
+	}
 
 	/* Tell children the revised config is now complete. */
 	if (main_sendboth(IMSG_RECONF_END, NULL, 0) == -1)
