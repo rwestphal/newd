@@ -35,7 +35,7 @@ void
 print_config(struct newd_conf *conf)
 {
 	struct group *g;
-	char buf[100], *bufp;
+	char buf[INET6_ADDRSTRLEN], *bufp;
 
 	printf("csock %s\n", conf->csock);
 
@@ -55,10 +55,12 @@ print_config(struct newd_conf *conf)
 
 		bufp = inet_net_ntop(AF_INET, &g->group_v4address,
 		    g->group_v4_bits, buf, sizeof(buf));
-		printf("\tgroup-v4address %s\n", bufp ? bufp : "<invalid>");
+		printf("\tgroup-v4address %s\n",
+		    bufp ? bufp : "<invalid IPv4>");
 		bufp = inet_net_ntop(AF_INET6, &g->group_v6address,
 		    g->group_v6_bits, buf, sizeof(buf));
-		printf("\tgroup-v6address %s\n", bufp ? bufp : "<invalid>");
+		printf("\tgroup-v6address %s\n",
+		    bufp ? bufp : "<invalid IPv6>");
 
 		printf("}\n");
 	}
