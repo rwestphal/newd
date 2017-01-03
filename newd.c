@@ -52,6 +52,7 @@ void	main_dispatch_engine(int, short, void *);
 
 int	main_reload(void);
 int	main_sendboth(enum imsg_type, void *, u_int16_t);
+void	main_showinfo_ctl(struct imsg *);
 
 int	pipe_main2frontend[2];
 int	pipe_main2engine[2];
@@ -323,6 +324,11 @@ main_dispatch_frontend(int fd, short event, void *bula)
 			memcpy(&verbose, imsg.data, sizeof(verbose));
 			log_verbose(verbose);
 			break;
+		case IMSG_CTL_SHOW_MAIN_INFO:
+			main_showinfo_ctl(&imsg);
+			main_imsg_compose_frontend(IMSG_CTL_END, imsg.hdr.pid,
+			    NULL, 0);
+			break;
 		default:
 			log_debug("main_dispatch_frontend: error handling "
 			    "imsg %d", imsg.hdr.type);
@@ -389,8 +395,7 @@ main_dispatch_engine(int fd, short event, void *bula)
 }
 
 void
-main_imsg_compose_frontend(int type, pid_t pid, void *data,
-    u_int16_t datalen)
+main_imsg_compose_frontend(int type, pid_t pid, void *data, u_int16_t datalen)
 {
 	if (iev_frontend)
 		imsg_compose_event(iev_frontend, type, 0, pid, -1, data,
@@ -459,6 +464,28 @@ main_sendboth(enum imsg_type type, void *buf, u_int16_t len)
 	if (imsg_compose_event(iev_engine, type, 0, 0, -1, buf, len) == -1)
 		return (-1);
 	return (0);
+}
+
+void
+main_showinfo_ctl(struct imsg *imsg)
+{
+	struct ctl_main_info cmi;
+	size_t n;
+
+	switch (imsg->hdr.type) {
+	case IMSG_CTL_SHOW_MAIN_INFO:
+		memset(cmi.text, 0, sizeof(cmi.text));
+		n = strlcpy(cmi.text, "I'm a little teapot.",
+		    sizeof(cmi.text));
+		if (n >= sizeof(cmi.text))
+			log_debug("main_showinfo_ctl: I was cut off!");
+		main_imsg_compose_frontend(IMSG_CTL_SHOW_MAIN_INFO,
+		    imsg->hdr.pid, &cmi, sizeof(cmi));
+		break;
+	default:
+		log_debug("main_showinfo_ctl: error handling imsg");
+		break;
+	}
 }
 
 void

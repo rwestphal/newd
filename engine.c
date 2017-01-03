@@ -43,6 +43,7 @@ void		 engine_sig_handler(int sig, short, void *);
 __dead void	 engine_shutdown(void);
 void		 engine_dispatch_frontend(int, short, void *);
 void		 engine_dispatch_main(int, short, void *);
+void		 engine_showinfo_ctl(struct imsg *);
 
 struct newd_conf	*engine_conf = NULL, *nconf = NULL;
 struct imsgev		*iev_frontend;
@@ -172,10 +173,10 @@ engine_shutdown(void)
 }
 
 int
-engine_imsg_compose_frontend(int type, u_int32_t peerid, pid_t pid, void *data,
+engine_imsg_compose_frontend(int type, pid_t pid, void *data,
     u_int16_t datalen)
 {
-	return (imsg_compose_event(iev_frontend, type, peerid, pid, -1,
+	return (imsg_compose_event(iev_frontend, type, 0, pid, -1,
 	    data, datalen));
 }
 
@@ -215,6 +216,11 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 			/* Already checked by frontend. */
 			memcpy(&verbose, imsg.data, sizeof(verbose));
 			log_verbose(verbose);
+			break;
+		case IMSG_CTL_SHOW_ENGINE_INFO:
+			engine_showinfo_ctl(&imsg);
+			engine_imsg_compose_frontend(IMSG_CTL_END,
+			    imsg.hdr.pid, NULL, 0);
 			break;
 		default:
 			log_debug("engine_dispatch_frontend: unexpected "
@@ -287,5 +293,42 @@ engine_dispatch_main(int fd, short event, void *bula)
 		/* this pipe is dead, so remove the event handler */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
+	}
+}
+
+void
+engine_showinfo_ctl(struct imsg *imsg)
+{
+	struct group *g;
+	struct ctl_engine_info cei;
+	char filter[NEWD_MAXGROUPNAME];
+
+	switch (imsg->hdr.type) {
+	case IMSG_CTL_SHOW_ENGINE_INFO:
+		memcpy(filter, imsg->data, sizeof(filter));
+		LIST_FOREACH(g, &engine_conf->group_list, entry) {
+			if (filter[0] == '\0' || memcmp(filter, g->name,
+			    sizeof(filter))) {
+				memcpy(cei.name, g->name, sizeof(cei.name));
+				cei.yesno = g->yesno;
+				cei.integer = g->integer;
+				cei.group_v4_bits = g->group_v4_bits;
+				cei.group_v6_bits = g->group_v6_bits;
+				memcpy(&cei.group_v4address,
+				    &g->group_v4address,
+				    sizeof(cei.group_v4address));
+				memcpy(&cei.group_v6address,
+				    &g->group_v6address,
+				    sizeof(cei.group_v6address));
+
+				engine_imsg_compose_frontend(
+				    IMSG_CTL_SHOW_ENGINE_INFO, imsg->hdr.pid,
+				    &cei, sizeof(cei));
+			}
+		}
+		break;
+	default:
+		log_debug("engine_showinfo_ctl: error handling imsg");
+		break;
 	}
 }

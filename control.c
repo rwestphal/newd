@@ -267,6 +267,22 @@ control_dispatch_imsg(int fd, short event, void *bula)
 			memcpy(&verbose, imsg.data, sizeof(verbose));
 			log_verbose(verbose);
 			break;
+		case IMSG_CTL_SHOW_MAIN_INFO:
+			c->iev.ibuf.pid = imsg.hdr.pid;
+			frontend_imsg_compose_main(imsg.hdr.type, imsg.hdr.pid,
+			    imsg.data, imsg.hdr.len - IMSG_HEADER_SIZE);
+			break;
+		case IMSG_CTL_SHOW_FRONTEND_INFO:
+			frontend_showinfo_ctl(c);
+			imsg_compose_event(&c->iev, IMSG_CTL_END, 0, 0, -1,
+			    NULL, 0);
+			break;
+		case IMSG_CTL_SHOW_ENGINE_INFO:
+			c->iev.ibuf.pid = imsg.hdr.pid;
+			frontend_imsg_compose_engine(imsg.hdr.type, 0,
+			    imsg.hdr.pid,
+			    imsg.data, imsg.hdr.len - IMSG_HEADER_SIZE);
+			break;
 		default:
 			log_debug("control_dispatch_imsg: "
 			    "error handling imsg %d", imsg.hdr.type);

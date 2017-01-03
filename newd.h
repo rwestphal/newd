@@ -41,8 +41,12 @@ struct imsgev {
 
 enum imsg_type {
 	IMSG_NONE,
-	IMSG_CTL_RELOAD,
 	IMSG_CTL_LOG_VERBOSE,
+	IMSG_CTL_RELOAD,
+	IMSG_CTL_SHOW_ENGINE_INFO,
+	IMSG_CTL_SHOW_FRONTEND_INFO,
+	IMSG_CTL_SHOW_MAIN_INFO,
+	IMSG_CTL_END,
 	IMSG_RECONF_CONF,
 	IMSG_RECONF_END
 };
@@ -74,6 +78,27 @@ struct newd_conf {
 	int		integer;
 	char		global_text[NEWD_MAXTEXT];
 	LIST_HEAD(, group)	group_list;
+};
+
+struct ctl_frontend_info {
+	u_int32_t	opts;
+	int		yesno;
+	int		integer;
+	char		global_text[NEWD_MAXTEXT];
+};
+
+struct ctl_engine_info {
+	char		name[NEWD_MAXGROUPNAME];
+	int		yesno;
+	int		integer;
+	int		group_v4_bits;
+	int		group_v6_bits;
+	struct in_addr	group_v4address;
+	struct in6_addr	group_v6address;
+};
+
+struct ctl_main_info {
+	char		text[NEWD_MAXTEXT];
 };
 
 /* newd.c */

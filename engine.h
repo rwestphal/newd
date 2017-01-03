@@ -19,5 +19,4 @@
 
 /* engine.c */
 pid_t		 engine(struct newd_conf *, int [2], int [2], int [2]);
-int		 engine_imsg_compose_frontend(int, u_int32_t, pid_t, void *,
-		     u_int16_t);
+int		 engine_imsg_compose_frontend(int, pid_t, void *, u_int16_t);

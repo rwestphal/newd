@@ -232,6 +232,9 @@ frontend_dispatch_main(int fd, short event, void *bula)
 			merge_config(frontend_conf, nconf);
 			nconf = NULL;
 			break;
+		case IMSG_CTL_SHOW_MAIN_INFO:
+			control_imsg_relay(&imsg);
+			break;
 		default:
 			log_debug("frontend_dispatch_main: error handling "
 			    "imsg %d", imsg.hdr.type);
@@ -277,6 +280,9 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 			break;
 
 		switch (imsg.hdr.type) {
+		case IMSG_CTL_SHOW_ENGINE_INFO:
+			control_imsg_relay(&imsg);
+			break;
 		default:
 			log_debug("frontend_dispatch_engine: error handling "
 			    "imsg %d", imsg.hdr.type);
@@ -291,4 +297,20 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
+}
+
+void
+frontend_showinfo_ctl(struct ctl_conn *c)
+{
+	static struct ctl_frontend_info cfi;
+
+	cfi.opts = frontend_conf->opts;
+	cfi.yesno = frontend_conf->yesno;
+	cfi.integer = frontend_conf->integer;
+
+	memcpy(cfi.global_text, frontend_conf->global_text,
+	    sizeof(cfi.global_text));
+
+	imsg_compose_event(&c->iev, IMSG_CTL_SHOW_FRONTEND_INFO, 0, 0, -1,
+	    &cfi, sizeof(struct ctl_frontend_info));
 }
