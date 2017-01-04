@@ -503,7 +503,25 @@ main_showinfo_ctl(struct imsg *imsg)
 void
 merge_config(struct newd_conf *conf, struct newd_conf *xconf)
 {
+	struct group	*g;
+
 	conf->opts = xconf->opts;
+	conf->yesno = xconf->yesno;
+	conf->integer = xconf->integer;
+	memcpy(conf->global_text, xconf->global_text,
+	    sizeof(conf->global_text));
+
+	/* Remove & discard existing groups. */
+	while ((g = LIST_FIRST(&conf->group_list)) != NULL) {
+		LIST_REMOVE(g, entry);
+		free(g);
+	}
+
+	/* Add new groups. */
+	while ((g = LIST_FIRST(&xconf->group_list)) != NULL) {
+		LIST_REMOVE(g, entry);
+		LIST_INSERT_HEAD(&conf->group_list, g, entry);
+	}
 
 	free(xconf);
 }
