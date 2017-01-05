@@ -59,7 +59,6 @@ frontend_sig_handler(int sig, short event, void *bula)
 	case SIGINT:
 	case SIGTERM:
 		frontend_shutdown();
-		/* NOTREACHED */
 	default:
 		fatalx("unexpected signal");
 	}
@@ -81,8 +80,6 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 	default:
 		return (pid);
 	}
-
-	/* Cleanup. */
 
 	/* Create newd control socket outside chroot. */
 	if (control_init(xconf->csock) == -1)
@@ -113,7 +110,7 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 
 	event_init();
 
-	/* setup signal handler */
+	/* Setup signal handler. */
 	signal_set(&ev_sigint, SIGINT, frontend_sig_handler, NULL);
 	signal_set(&ev_sigterm, SIGTERM, frontend_sig_handler, NULL);
 	signal_add(&ev_sigint, NULL);
@@ -146,14 +143,13 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 	    iev_main->handler, iev_main);
 	event_add(&iev_main->ev, NULL);
 
-	/* listen on newd control socket */
+	/* Listen on control socket. */
 	TAILQ_INIT(&ctl_conns);
 	control_listen();
 
 	event_dispatch();
 
 	frontend_shutdown();
-	/* NOTREACHED */
 	return (0);
 }
 

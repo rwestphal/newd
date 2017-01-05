@@ -46,7 +46,7 @@
 __dead void	usage(void);
 __dead void	main_shutdown(void);
 
-void		main_sig_handler(int, short, void *);
+void	main_sig_handler(int, short, void *);
 
 void	main_dispatch_frontend(int, short, void *);
 void	main_dispatch_engine(int, short, void *);
@@ -64,8 +64,8 @@ struct imsgev		*iev_frontend;
 struct imsgev		*iev_engine;
 char			*conffile;
 
-pid_t			 frontend_pid;
-pid_t			 engine_pid;
+pid_t	 frontend_pid;
+pid_t	 engine_pid;
 
 void
 main_sig_handler(int sig, short event, void *arg)
@@ -103,10 +103,10 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	struct event		 ev_sigint, ev_sigterm, ev_sighup;
-	int			 ch, opts = 0;
-	int			 debug = 0;
-	char			*sockname;
+	struct event	 ev_sigint, ev_sigterm, ev_sighup;
+	int		 ch, opts = 0;
+	int		 debug = 0;
+	char		*sockname;
 
 	conffile = CONF_FILE;
 	newd_process = PROC_MAIN;
@@ -137,7 +137,6 @@ main(int argc, char *argv[])
 			break;
 		default:
 			usage();
-			/* NOTREACHED */
 		}
 	}
 
@@ -145,11 +144,6 @@ main(int argc, char *argv[])
 	argv += optind;
 	if (argc > 0)
 		usage();
-
-	/*
-	 * Check system environment (e.g. appropriate sysctl settings) and
-	 * save anything required for future operations.
-	 */
 
 	/* parse config file */
 	if ((main_conf = parse_config(conffile, opts)) == NULL) {
@@ -238,7 +232,6 @@ main(int argc, char *argv[])
 	event_dispatch();
 
 	main_shutdown();
-	/* NOTREACHED */
 	return (0);
 }
 
@@ -248,15 +241,13 @@ main_shutdown(void)
 	pid_t	 pid;
 	int	 status;
 
-	/* close pipes */
+	/* Close pipes. */
 	msgbuf_clear(&iev_frontend->ibuf.w);
 	close(iev_frontend->ibuf.fd);
 	msgbuf_clear(&iev_engine->ibuf.w);
 	close(iev_engine->ibuf.fd);
 
 	control_cleanup(main_conf->csock);
-
-	/* Shutdown/cleanup anything else needing attention. */
 
 	log_debug("waiting for children to terminate");
 	do {

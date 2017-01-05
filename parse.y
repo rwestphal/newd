@@ -275,7 +275,7 @@ kw_cmp(const void *k, const void *e)
 int
 lookup(char *s)
 {
-	/* this has to be sorted always */
+	/* This has to be sorted always. */
 	static const struct keywords keywords[] = {
 		{"global-text",		GLOBAL_TEXT},
 		{"group",		GROUP},
@@ -376,7 +376,7 @@ findeol(void)
 
 	parsebuf = NULL;
 
-	/* skip to either EOF or the first real EOL */
+	/* Skip to either EOF or the first real EOL. */
 	while (1) {
 		if (pushback_index)
 			c = pushback_buffer[--pushback_index];

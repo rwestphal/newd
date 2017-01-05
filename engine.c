@@ -77,7 +77,6 @@ engine(struct newd_conf *xconf, int pipe_main2engine[2],
 	switch (pid = fork()) {
 	case -1:
 		fatal("cannot fork");
-		/* NOTREACHED */
 	case 0:
 		break;
 	default:
@@ -144,7 +143,6 @@ engine(struct newd_conf *xconf, int pipe_main2engine[2],
 	event_dispatch();
 
 	engine_shutdown();
-	/* NOTREACHED */
 
 	return (0);
 }
@@ -188,20 +186,20 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("engine_dispatch_main: imsg_get error");
-		if (n == 0)	/* No more messages to process. */
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -244,20 +242,20 @@ engine_dispatch_main(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("engine_dispatch_main: imsg_get error");
-		if (n == 0)	/* No more messages to process. */
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
