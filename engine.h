@@ -17,6 +17,5 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/* engine.c */
 pid_t		 engine(struct newd_conf *, int [2], int [2], int [2]);
 int		 engine_imsg_compose_frontend(int, pid_t, void *, u_int16_t);

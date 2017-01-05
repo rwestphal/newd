@@ -32,11 +32,11 @@ static const char * const log_procnames[] = {
 };
 
 struct imsgev {
-	struct imsgbuf		 ibuf;
-	void			(*handler)(int, short, void *);
-	struct event		 ev;
-	void			*data;
-	short			 events;
+	struct imsgbuf	 ibuf;
+	void		(*handler)(int, short, void *);
+	struct event	 ev;
+	void		*data;
+	short		 events;
 };
 
 enum imsg_type {

@@ -19,7 +19,6 @@
 
 TAILQ_HEAD(ctl_conns, ctl_conn)	ctl_conns;
 
-/* frontend.c */
 pid_t		 frontend(struct newd_conf *, int[2], int[2], int[2]);
 void		 frontend_dispatch_main(int, short, void *);
 void		 frontend_dispatch_engine(int, short, void *);

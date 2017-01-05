@@ -40,17 +40,21 @@
 #include "control.h"
 #include "log.h"
 
-void		 frontend_sig_handler(int, short, void *);
 __dead void	 frontend_shutdown(void);
+void		 frontend_sig_handler(int, short, void *);
 
 struct newd_conf	*frontend_conf = NULL, *nconf;
 struct imsgev		*iev_main;
 struct imsgev		*iev_engine;
 
-/* ARGSUSED */
 void
 frontend_sig_handler(int sig, short event, void *bula)
 {
+	/*
+	 * Normal signal handler rules don't apply because libevent
+	 * decouples for us.
+	 */
+
 	switch (sig) {
 	case SIGINT:
 	case SIGTERM:
@@ -142,8 +146,6 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 	    iev_main->handler, iev_main);
 	event_add(&iev_main->ev, NULL);
 
-	/* Remove config stuff that is no longer needed. */
-
 	/* listen on newd control socket */
 	TAILQ_INIT(&ctl_conns);
 	control_listen();
@@ -176,7 +178,6 @@ frontend_shutdown(void)
 	_exit(0);
 }
 
-/* imesg */
 int
 frontend_imsg_compose_main(int type, pid_t pid, void *data,
     u_int16_t datalen)
@@ -193,7 +194,6 @@ frontend_imsg_compose_engine(int type, u_int32_t peerid, pid_t pid,
 	    data, datalen));
 }
 
-/* ARGSUSED */
 void
 frontend_dispatch_main(int fd, short event, void *bula)
 {
@@ -206,20 +206,20 @@ frontend_dispatch_main(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("frontend_dispatch_main: imsg_get error");
-		if (n == 0)
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -254,13 +254,12 @@ frontend_dispatch_main(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler. */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
 }
 
-/* ARGSUSED */
 void
 frontend_dispatch_engine(int fd, short event, void *bula)
 {
@@ -272,20 +271,20 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("frontend_dispatch_engine: imsg_get error");
-		if (n == 0)
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -303,7 +302,7 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler. */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}

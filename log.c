@@ -72,8 +72,9 @@ vlog(int pri, const char *fmt, va_list ap)
 {
 	char	*nfmt;
 
+	/* Make best effort to work even in out of memory situations. */
+
 	if (debug) {
-		/* best effort in out of mem situations */
 		if (asprintf(&nfmt, "%s\n", fmt) == -1) {
 			vfprintf(stderr, fmt, ap);
 			fprintf(stderr, "\n");
@@ -92,14 +93,14 @@ log_warn(const char *emsg, ...)
 	char	*nfmt;
 	va_list	 ap;
 
-	/* best effort to even work in out of memory situations */
+	/* Make best effort to work even in out of memory situations. */
+
 	if (emsg == NULL)
 		logit(LOG_CRIT, "%s", strerror(errno));
 	else {
 		va_start(ap, emsg);
 
 		if (asprintf(&nfmt, "%s: %s", emsg, strerror(errno)) == -1) {
-			/* we tried it... */
 			vlog(LOG_CRIT, emsg, ap);
 			logit(LOG_CRIT, "%s", strerror(errno));
 		} else {
@@ -158,7 +159,7 @@ fatal(const char *emsg)
 
 	if (newd_process == PROC_MAIN)
 		exit(1);
-	else				/* parent copes via SIGCHLD */
+	else				/* Parent copes via SIGCHLD. */
 		_exit(1);
 }
 

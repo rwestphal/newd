@@ -116,7 +116,6 @@ control_cleanup(char *path)
 	unlink(path);
 }
 
-/* ARGSUSED */
 void
 control_accept(int listenfd, short event, void *bula)
 {
@@ -168,9 +167,10 @@ control_connbyfd(int fd)
 {
 	struct ctl_conn	*c;
 
-	for (c = TAILQ_FIRST(&ctl_conns); c != NULL && c->iev.ibuf.fd != fd;
-	    c = TAILQ_NEXT(c, entry))
-		;	/* nothing */
+	TAILQ_FOREACH(c, &ctl_conns, entry) {
+		if (c->iev.ibuf.fd == fd)
+			break;
+	}
 
 	return (c);
 }
@@ -180,9 +180,10 @@ control_connbypid(pid_t pid)
 {
 	struct ctl_conn	*c;
 
-	for (c = TAILQ_FIRST(&ctl_conns); c != NULL && c->iev.ibuf.pid != pid;
-	    c = TAILQ_NEXT(c, entry))
-		;	/* nothing */
+	TAILQ_FOREACH(c, &ctl_conns, entry) {
+		if (c->iev.ibuf.pid == pid)
+			break;
+	}
 
 	return (c);
 }
@@ -212,7 +213,6 @@ control_close(int fd)
 	free(c);
 }
 
-/* ARGSUSED */
 void
 control_dispatch_imsg(int fd, short event, void *bula)
 {
@@ -245,7 +245,6 @@ control_dispatch_imsg(int fd, short event, void *bula)
 			control_close(fd);
 			return;
 		}
-
 		if (n == 0)
 			break;
 
@@ -258,11 +257,12 @@ control_dispatch_imsg(int fd, short event, void *bula)
 			    sizeof(verbose))
 				break;
 
-			/* forward to other processes */
+			/* Forward to all other processes. */
 			frontend_imsg_compose_main(imsg.hdr.type, imsg.hdr.pid,
 			    imsg.data, imsg.hdr.len - IMSG_HEADER_SIZE);
-			frontend_imsg_compose_engine(imsg.hdr.type, 0, imsg.hdr.pid,
-			    imsg.data, imsg.hdr.len - IMSG_HEADER_SIZE);
+			frontend_imsg_compose_engine(imsg.hdr.type, 0,
+			    imsg.hdr.pid, imsg.data,
+			    imsg.hdr.len - IMSG_HEADER_SIZE);
 
 			memcpy(&verbose, imsg.data, sizeof(verbose));
 			log_verbose(verbose);

@@ -43,9 +43,10 @@
 #include "control.h"
 #include "log.h"
 
-void		main_sig_handler(int, short, void *);
 __dead void	usage(void);
 __dead void	main_shutdown(void);
+
+void		main_sig_handler(int, short, void *);
 
 void	main_dispatch_frontend(int, short, void *);
 void	main_dispatch_engine(int, short, void *);
@@ -58,24 +59,26 @@ int	pipe_main2frontend[2];
 int	pipe_main2engine[2];
 int	pipe_frontend2engine[2];
 
-struct newd_conf	*main_conf = NULL;
+struct newd_conf	*main_conf;
 struct imsgev		*iev_frontend;
 struct imsgev		*iev_engine;
 char			*conffile;
 
-pid_t			 frontend_pid = 0;
-pid_t			 engine_pid = 0;
+pid_t			 frontend_pid;
+pid_t			 engine_pid;
 
-/* ARGSUSED */
 void
 main_sig_handler(int sig, short event, void *arg)
 {
-	/* signal handler rules don't apply, libevent decouples for us */
+	/*
+	 * Normal signal handler rules don't apply because libevent
+	 * decouples for us.
+	 */
+
 	switch (sig) {
 	case SIGTERM:
 	case SIGINT:
 		main_shutdown();
-		/* NOTREACHED */
 	case SIGHUP:
 		if (main_reload() == -1)
 			log_warnx("configuration reload failed");
@@ -84,7 +87,6 @@ main_sig_handler(int sig, short event, void *arg)
 		break;
 	default:
 		fatalx("unexpected signal");
-		/* NOTREACHED */
 	}
 }
 
@@ -111,7 +113,7 @@ main(int argc, char *argv[])
 	log_procname = log_procnames[newd_process];
 	sockname = NEWD_SOCKET;
 
-	log_init(1);	/* log to stderr until daemonized */
+	log_init(1);	/* Log to stderr until daemonized. */
 	log_verbose(1);
 
 	while ((ch = getopt(argc, argv, "df:ns:v")) != -1) {
@@ -198,7 +200,7 @@ main(int argc, char *argv[])
 	setproctitle("main");
 	event_init();
 
-	/* setup signal handler */
+	/* Setup signal handler. */
 	signal_set(&ev_sigint, SIGINT, main_sig_handler, NULL);
 	signal_set(&ev_sigterm, SIGTERM, main_sig_handler, NULL);
 	signal_set(&ev_sighup, SIGHUP, main_sig_handler, NULL);
@@ -207,7 +209,7 @@ main(int argc, char *argv[])
 	signal_add(&ev_sighup, NULL);
 	signal(SIGPIPE, SIG_IGN);
 
-	/* setup pipes to children */
+	/* Setup pipes to children. */
 	close(pipe_main2frontend[1]);
 	close(pipe_main2engine[1]);
 	close(pipe_frontend2engine[0]);
@@ -232,9 +234,6 @@ main(int argc, char *argv[])
 	    iev_engine->handler, iev_engine);
 	event_add(&iev_engine->ev, NULL);
 
-	/* Do any remaining initialization. */
-
-	/* Remove no longer needed stuff from config. */
 
 	event_dispatch();
 
@@ -246,8 +245,8 @@ main(int argc, char *argv[])
 __dead void
 main_shutdown(void)
 {
-	pid_t			 pid;
-	int			 status;
+	pid_t	 pid;
+	int	 status;
 
 	/* close pipes */
 	msgbuf_clear(&iev_frontend->ibuf.w);
@@ -279,8 +278,6 @@ main_shutdown(void)
 	exit(0);
 }
 
-/* imsg handling */
-/* ARGSUSED */
 void
 main_dispatch_frontend(int fd, short event, void *bula)
 {
@@ -295,21 +292,20 @@ main_dispatch_frontend(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("imsg_get");
-
-		if (n == 0)
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -337,13 +333,12 @@ main_dispatch_frontend(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
 }
 
-/* ARGSUSED */
 void
 main_dispatch_engine(int fd, short event, void *bula)
 {
@@ -358,21 +353,20 @@ main_dispatch_engine(int fd, short event, void *bula)
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)
 			fatal("imsg_read error");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 	if (event & EV_WRITE) {
 		if ((n = msgbuf_write(&ibuf->w)) == -1 && errno != EAGAIN)
 			fatal("msgbuf_write");
-		if (n == 0)	/* connection closed */
+		if (n == 0)	/* Connection closed. */
 			shut = 1;
 	}
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("imsg_get");
-
-		if (n == 0)
+		if (n == 0)	/* No more messages. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -386,7 +380,7 @@ main_dispatch_engine(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler. */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
@@ -426,9 +420,10 @@ imsg_compose_event(struct imsgev *iev, u_int16_t type, u_int32_t peerid,
 {
 	int	ret;
 
-	if ((ret = imsg_compose(&iev->ibuf, type, peerid,
-	    pid, fd, data, datalen)) != -1)
+	if ((ret = imsg_compose(&iev->ibuf, type, peerid, pid, fd, data,
+	    datalen)) != -1)
 		imsg_event_add(iev);
+
 	return (ret);
 }
 

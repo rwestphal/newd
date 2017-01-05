@@ -39,35 +39,33 @@
 #include "engine.h"
 #include "log.h"
 
-void		 engine_sig_handler(int sig, short, void *);
 __dead void	 engine_shutdown(void);
+void		 engine_sig_handler(int sig, short, void *);
 void		 engine_dispatch_frontend(int, short, void *);
 void		 engine_dispatch_main(int, short, void *);
 void		 engine_showinfo_ctl(struct imsg *);
 
-struct newd_conf	*engine_conf = NULL, *nconf = NULL;
+struct newd_conf	*engine_conf, *nconf;
 struct imsgev		*iev_frontend;
 struct imsgev		*iev_main;
 
-/* ARGSUSED */
 void
 engine_sig_handler(int sig, short event, void *arg)
 {
 	/*
-	 * signal handler rules don't apply, libevent decouples for us
+	 * Normal signal handler rules don't apply because libevent
+	 * decouples for us.
 	 */
 
 	switch (sig) {
 	case SIGINT:
 	case SIGTERM:
 		engine_shutdown();
-		/* NOTREACHED */
 	default:
 		fatalx("unexpected signal");
 	}
 }
 
-/* engine */
 pid_t
 engine(struct newd_conf *xconf, int pipe_main2engine[2],
     int pipe_frontend2engine[2], int pipe_main2frontend[2])
@@ -85,8 +83,6 @@ engine(struct newd_conf *xconf, int pipe_main2engine[2],
 	default:
 		return (pid);
 	}
-
-	/* Cleanup. */
 
 	engine_conf = xconf;
 
@@ -145,8 +141,6 @@ engine(struct newd_conf *xconf, int pipe_main2engine[2],
 	    iev_main->handler, iev_main);
 	event_add(&iev_main->ev, NULL);
 
-	/* Remove unneeded stuff from config */
-
 	event_dispatch();
 
 	engine_shutdown();
@@ -180,7 +174,6 @@ engine_imsg_compose_frontend(int type, pid_t pid, void *data,
 	    data, datalen));
 }
 
-/* ARGSUSED */
 void
 engine_dispatch_frontend(int fd, short event, void *bula)
 {
@@ -208,7 +201,7 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("engine_dispatch_main: imsg_get error");
-		if (n == 0)
+		if (n == 0)	/* No more messages to process. */
 			break;
 
 		switch (imsg.hdr.type) {
@@ -230,13 +223,12 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler. */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
 }
 
-/* ARGSUSED */
 void
 engine_dispatch_main(int fd, short event, void *bula)
 {
@@ -265,13 +257,12 @@ engine_dispatch_main(int fd, short event, void *bula)
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
 			fatal("engine_dispatch_main: imsg_get error");
-		if (n == 0)
+		if (n == 0)	/* No more messages to process. */
 			break;
 
 		switch (imsg.hdr.type) {
 		case IMSG_RECONF_CONF:
-			if ((nconf = malloc(sizeof(struct newd_conf))) ==
-			    NULL)
+			if ((nconf = malloc(sizeof(struct newd_conf))) == NULL)
 				fatal(NULL);
 			memcpy(nconf, imsg.data, sizeof(struct newd_conf));
 			LIST_INIT(&nconf->group_list);
@@ -296,7 +287,7 @@ engine_dispatch_main(int fd, short event, void *bula)
 	if (!shut)
 		imsg_event_add(iev);
 	else {
-		/* this pipe is dead, so remove the event handler */
+		/* This pipe is dead. Remove its event handler. */
 		event_del(&iev->ev);
 		event_loopexit(NULL);
 	}
@@ -305,9 +296,9 @@ engine_dispatch_main(int fd, short event, void *bula)
 void
 engine_showinfo_ctl(struct imsg *imsg)
 {
-	struct group *g;
-	struct ctl_engine_info cei;
 	char filter[NEWD_MAXGROUPNAME];
+	struct ctl_engine_info cei;
+	struct group *g;
 
 	switch (imsg->hdr.type) {
 	case IMSG_CTL_SHOW_ENGINE_INFO:
