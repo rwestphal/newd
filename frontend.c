@@ -65,28 +65,20 @@ frontend_sig_handler(int sig, short event, void *bula)
 }
 
 pid_t
-frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
-    int pipe_frontend2engine[2], int pipe_main2engine[2])
+frontend(int debug, int verbose, char *sockname)
 {
 	struct event	 ev_sigint, ev_sigterm;
 	struct passwd	*pw;
-	pid_t		 pid;
 
-	switch (pid = fork()) {
-	case -1:
-		fatal("cannot fork");
-	case 0:
-		break;
-	default:
-		return (pid);
-	}
+	frontend_conf = config_new_empty();
+
+	log_init(debug);
+	log_verbose(verbose);
 
 	/* Create newd control socket outside chroot. */
-	if (control_init(xconf->csock) == -1)
+	frontend_conf->csock = strdup(sockname);
+	if (control_init(frontend_conf->csock) == -1)
 		fatalx("control socket setup failed");
-
-	/* Set defaults. */
-	frontend_conf = xconf;
 
 	if ((pw = getpwnam(NEWD_USER)) == NULL)
 		fatal("getpwnam");
@@ -105,7 +97,7 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 	    setresuid(pw->pw_uid, pw->pw_uid, pw->pw_uid))
 		fatal("can't drop privileges");
 
-	if (pledge("stdio inet", NULL) == -1)
+	if (pledge("stdio inet recvfd", NULL) == -1)
 		fatal("pledge");
 
 	event_init();
@@ -118,26 +110,11 @@ frontend(struct newd_conf *xconf, int pipe_main2frontend[2],
 	signal(SIGPIPE, SIG_IGN);
 	signal(SIGHUP, SIG_IGN);
 
-	/* Setup pipes. */
-	close(pipe_main2frontend[0]);
-	close(pipe_frontend2engine[1]);
-	close(pipe_main2engine[0]);
-	close(pipe_main2engine[1]);
-
-	if ((iev_engine = malloc(sizeof(struct imsgev))) == NULL ||
-	    (iev_main = malloc(sizeof(struct imsgev))) == NULL)
+	/* Setup pipe and event handler to the parent process. */
+	if ((iev_main = malloc(sizeof(struct imsgev))) == NULL)
 		fatal(NULL);
-	imsg_init(&iev_engine->ibuf, pipe_frontend2engine[0]);
-	iev_engine->handler = frontend_dispatch_engine;
-	imsg_init(&iev_main->ibuf, pipe_main2frontend[1]);
+	imsg_init(&iev_main->ibuf, 3);
 	iev_main->handler = frontend_dispatch_main;
-
-	/* Setup event handlers. */
-	iev_engine->events = EV_READ;
-	event_set(&iev_engine->ev, iev_engine->ibuf.fd, iev_engine->events,
-	    iev_engine->handler, iev_engine);
-	event_add(&iev_engine->ev, NULL);
-
 	iev_main->events = EV_READ;
 	event_set(&iev_main->ev, iev_main->ibuf.fd, iev_main->events,
 	    iev_main->handler, iev_main);
@@ -219,6 +196,35 @@ frontend_dispatch_main(int fd, short event, void *bula)
 			break;
 
 		switch (imsg.hdr.type) {
+		case IMSG_SOCKET_IPC:
+			/*
+			 * Setup pipe and event handler to the engine
+			 * process.
+			 */
+			if (iev_engine) {
+				log_warnx("%s: received unexpected imsg fd "
+				    "to frontend", __func__);
+				break;
+			}
+			if ((fd = imsg.fd) == -1) {
+				log_warnx("%s: expected to receive imsg fd to "
+				   "frontend but didn't receive any",
+				   __func__);
+				break;
+			}
+
+			iev_engine = malloc(sizeof(struct imsgev));
+			if (iev_engine == NULL)
+				fatal(NULL);
+
+			imsg_init(&iev_engine->ibuf, fd);
+			iev_engine->handler = frontend_dispatch_engine;
+			iev_engine->events = EV_READ;
+
+			event_set(&iev_engine->ev, iev_engine->ibuf.fd,
+			iev_engine->events, iev_engine->handler, iev_engine);
+			event_add(&iev_engine->ev, NULL);
+			break;
 		case IMSG_RECONF_CONF:
 			if ((nconf = malloc(sizeof(struct newd_conf))) ==
 			    NULL)

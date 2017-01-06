@@ -49,7 +49,8 @@ enum imsg_type {
 	IMSG_CTL_END,
 	IMSG_RECONF_CONF,
 	IMSG_RECONF_GROUP,
-	IMSG_RECONF_END
+	IMSG_RECONF_END,
+	IMSG_SOCKET_IPC
 };
 
 enum {
@@ -109,6 +110,9 @@ void	merge_config(struct newd_conf *, struct newd_conf *);
 void	imsg_event_add(struct imsgev *);
 int	imsg_compose_event(struct imsgev *, u_int16_t, u_int32_t, pid_t,
 	    int, void *, u_int16_t);
+
+struct newd_conf       *config_new_empty(void);
+void			config_clear(struct newd_conf *);
 
 /* printconf.c */
 void	print_config(struct newd_conf *);

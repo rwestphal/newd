@@ -48,16 +48,17 @@ __dead void	main_shutdown(void);
 
 void	main_sig_handler(int, short, void *);
 
+static pid_t	start_child(int, char *, int, int, int, char *);
+
 void	main_dispatch_frontend(int, short, void *);
 void	main_dispatch_engine(int, short, void *);
+
+static int	main_imsg_send_ipc_sockets(struct imsgbuf *, struct imsgbuf *);
+static int     main_imsg_send_config(struct newd_conf *);
 
 int	main_reload(void);
 int	main_sendboth(enum imsg_type, void *, u_int16_t);
 void	main_showinfo_ctl(struct imsg *);
-
-int	pipe_main2frontend[2];
-int	pipe_main2engine[2];
-int	pipe_frontend2engine[2];
 
 struct newd_conf	*main_conf;
 struct imsgev		*iev_frontend;
@@ -105,8 +106,11 @@ main(int argc, char *argv[])
 {
 	struct event	 ev_sigint, ev_sigterm, ev_sighup;
 	int		 ch, opts = 0;
-	int		 debug = 0;
+	int		 debug = 0, engine_flag = 0, frontend_flag = 0;
 	char		*sockname;
+	char		*saved_argv0;
+	int		 pipe_main2frontend[2];
+	int		 pipe_main2engine[2];
 
 	conffile = CONF_FILE;
 	newd_process = PROC_MAIN;
@@ -116,10 +120,20 @@ main(int argc, char *argv[])
 	log_init(1);	/* Log to stderr until daemonized. */
 	log_verbose(1);
 
-	while ((ch = getopt(argc, argv, "df:ns:v")) != -1) {
+	saved_argv0 = argv[0];
+	if (saved_argv0 == NULL)
+		saved_argv0 = "newd";
+
+	while ((ch = getopt(argc, argv, "dEFf:ns:v")) != -1) {
 		switch (ch) {
 		case 'd':
 			debug = 1;
+			break;
+		case 'E':
+			engine_flag = 1;
+			break;
+		case 'F':
+			frontend_flag = 1;
 			break;
 		case 'f':
 			conffile = optarg;
@@ -142,14 +156,18 @@ main(int argc, char *argv[])
 
 	argc -= optind;
 	argv += optind;
-	if (argc > 0)
+	if (argc > 0 || (engine_flag && frontend_flag))
 		usage();
+
+	if (engine_flag)
+		engine(debug, opts & OPT_VERBOSE);
+	else if (frontend_flag)
+		frontend(debug, opts & OPT_VERBOSE, sockname);
 
 	/* parse config file */
 	if ((main_conf = parse_config(conffile, opts)) == NULL) {
 		exit(1);
 	}
-	main_conf->csock = sockname;
 
 	if (main_conf->opts & OPT_NOACTION) {
 		if (main_conf->opts & OPT_VERBOSE)
@@ -181,15 +199,12 @@ main(int argc, char *argv[])
 	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
 	    PF_UNSPEC, pipe_main2engine) == -1)
 		fatal("main2engine socketpair");
-	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
-	    PF_UNSPEC, pipe_frontend2engine) == -1)
-		fatal("frontend2engine socketpair");
 
 	/* Start children. */
-	engine_pid = engine(main_conf, pipe_main2engine,
-	    pipe_frontend2engine, pipe_main2frontend);
-	frontend_pid = frontend(main_conf, pipe_main2frontend,
-	    pipe_frontend2engine, pipe_main2engine);
+	engine_pid = start_child(PROC_ENGINE, saved_argv0, pipe_main2engine[1],
+	    debug, opts & OPT_VERBOSE, NULL);
+	frontend_pid = start_child(PROC_FRONTEND, saved_argv0,
+	    pipe_main2frontend[1], debug, opts & OPT_VERBOSE, sockname);
 
 	setproctitle("main");
 	event_init();
@@ -204,10 +219,6 @@ main(int argc, char *argv[])
 	signal(SIGPIPE, SIG_IGN);
 
 	/* Setup pipes to children. */
-	close(pipe_main2frontend[1]);
-	close(pipe_main2engine[1]);
-	close(pipe_frontend2engine[0]);
-	close(pipe_frontend2engine[1]);
 
 	if ((iev_frontend = malloc(sizeof(struct imsgev))) == NULL ||
 	    (iev_engine = malloc(sizeof(struct imsgev))) == NULL)
@@ -228,6 +239,12 @@ main(int argc, char *argv[])
 	    iev_engine->handler, iev_engine);
 	event_add(&iev_engine->ev, NULL);
 
+	if (main_imsg_send_ipc_sockets(&iev_frontend->ibuf, &iev_engine->ibuf))
+		fatal("could not establish imsg links");
+	main_imsg_send_config(main_conf);
+
+	if (pledge("stdio sendfd", NULL) == -1)
+		fatal("pledge");
 
 	event_dispatch();
 
@@ -248,6 +265,7 @@ main_shutdown(void)
 	close(iev_engine->ibuf.fd);
 
 	control_cleanup(main_conf->csock);
+	config_clear(main_conf);
 
 	log_debug("waiting for children to terminate");
 	do {
@@ -267,6 +285,52 @@ main_shutdown(void)
 
 	log_info("terminating");
 	exit(0);
+}
+
+static pid_t
+start_child(int p, char *argv0, int fd, int debug, int verbose,
+    char *sockname)
+{
+	char	*argv[7];
+	int	 argc = 0;
+	pid_t	 pid;
+
+	switch (pid = fork()) {
+	case -1:
+		fatal("cannot fork");
+	case 0:
+		break;
+	default:
+		close(fd);
+		return (pid);
+	}
+
+	if (dup2(fd, 3) == -1)
+		fatal("cannot setup imsg fd");
+
+	argv[argc++] = argv0;
+	switch (p) {
+	case PROC_MAIN:
+		fatalx("Can not start main process");
+	case PROC_ENGINE:
+		argv[argc++] = "-E";
+		break;
+	case PROC_FRONTEND:
+		argv[argc++] = "-F";
+		break;
+	}
+	if (debug)
+		argv[argc++] = "-d";
+	if (verbose)
+		argv[argc++] = "-v";
+	if (sockname) {
+		argv[argc++] = "-s";
+		argv[argc++] = sockname;
+	}
+	argv[argc++] = NULL;
+
+	execvp(argv0, argv);
+	fatal("execvp");
 }
 
 void
@@ -418,14 +482,46 @@ imsg_compose_event(struct imsgev *iev, u_int16_t type, u_int32_t peerid,
 	return (ret);
 }
 
+static int
+main_imsg_send_ipc_sockets(struct imsgbuf *frontend_buf,
+    struct imsgbuf *engine_buf)
+{
+	int pipe_frontend2engine[2];
+
+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
+	    PF_UNSPEC, pipe_frontend2engine) == -1)
+		return (-1);
+
+	if (imsg_compose(frontend_buf, IMSG_SOCKET_IPC, 0, 0,
+	    pipe_frontend2engine[0], NULL, 0) == -1)
+		return (-1);
+	if (imsg_compose(engine_buf, IMSG_SOCKET_IPC, 0, 0,
+	    pipe_frontend2engine[1], NULL, 0) == -1)
+		return (-1);
+
+	return (0);
+}
+
 int
 main_reload(void)
 {
 	struct newd_conf *xconf;
-	struct group	 *g;
 
 	if ((xconf = parse_config(conffile, main_conf->opts)) == NULL)
 		return (-1);
+
+	if (main_imsg_send_config(xconf) == -1)
+		return (-1);
+
+	merge_config(main_conf, xconf);
+
+	return (0);
+}
+
+int
+main_imsg_send_config(struct newd_conf *xconf)
+{
+	struct group	 *g;
 
 	/* Send fixed part of config to children. */
 	if (main_sendboth(IMSG_RECONF_CONF, xconf, sizeof(*xconf)) == -1)
@@ -441,7 +537,6 @@ main_reload(void)
 	if (main_sendboth(IMSG_RECONF_END, NULL, 0) == -1)
 		return (-1);
 
-	merge_config(main_conf, xconf);
 	return (0);
 }
 
@@ -510,4 +605,30 @@ merge_config(struct newd_conf *conf, struct newd_conf *xconf)
 	}
 
 	free(xconf);
+}
+
+struct newd_conf *
+config_new_empty(void)
+{
+	struct newd_conf	*xconf;
+
+	xconf = calloc(1, sizeof(*xconf));
+	if (xconf == NULL)
+		fatal(NULL);
+
+	LIST_INIT(&xconf->group_list);
+
+	return (xconf);
+}
+
+void
+config_clear(struct newd_conf *conf)
+{
+	struct newd_conf	*xconf;
+
+	/* Merge current config with an empty config. */
+	xconf = config_new_empty();
+	merge_config(conf, xconf);
+
+	free(conf);
 }

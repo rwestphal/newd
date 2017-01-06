@@ -613,8 +613,8 @@ parse_config(char *filename, int opts)
 {
 	struct sym	*sym, *next;
 
-	if ((conf = calloc(1, sizeof(struct newd_conf))) == NULL)
-		fatal("parse_config");
+	conf = config_new_empty();
+
 	conf->opts = opts;
 
 	file = pushfile(filename, !(conf->opts & OPT_NOACTION));
