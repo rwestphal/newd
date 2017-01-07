@@ -1,7 +1,6 @@
 /*	$OpenBSD$	*/
 
 /*
- * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  * Copyright (c) 2004, 2005 Esben Norby <norby@openbsd.org>
  *
  * Permission to use, copy, modify, and distribute this software for any

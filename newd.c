@@ -1,7 +1,6 @@
 /*	$OpenBSD$	*/
 
 /*
- * Copyright (c) YYYY YOUR NAME HERE <user@your.dom.ain>
  * Copyright (c) 2005 Claudio Jeker <claudio@openbsd.org>
  * Copyright (c) 2004 Esben Norby <norby@openbsd.org>
  * Copyright (c) 2003, 2004 Henning Brauer <henning@openbsd.org>
