@@ -148,7 +148,7 @@ frontend_shutdown(void)
 	free(frontend_conf);
 
 	log_info("frontend exiting");
-	_exit(0);
+	exit(0);
 }
 
 int

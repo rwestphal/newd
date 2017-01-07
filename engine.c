@@ -141,7 +141,7 @@ engine_shutdown(void)
 	free(engine_conf);
 
 	log_info("engine exiting");
-	_exit(0);
+	exit(0);
 }
 
 int

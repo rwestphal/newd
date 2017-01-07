@@ -288,8 +288,7 @@ main_shutdown(void)
 }
 
 static pid_t
-start_child(int p, char *argv0, int fd, int debug, int verbose,
-    char *sockname)
+start_child(int p, char *argv0, int fd, int debug, int verbose, char *sockname)
 {
 	char	*argv[7];
 	int	 argc = 0;
