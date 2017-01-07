@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <sys/socket.h>
+#include <sys/syslog.h>
 #include <sys/uio.h>
 
 #include <netinet/in.h>
@@ -38,7 +39,6 @@
 #include "newd.h"
 #include "frontend.h"
 #include "control.h"
-#include "log.h"
 
 __dead void	 frontend_shutdown(void);
 void		 frontend_sig_handler(int, short, void *);
@@ -72,7 +72,7 @@ frontend(int debug, int verbose, char *sockname)
 
 	frontend_conf = config_new_empty();
 
-	log_init(debug);
+	log_init(debug, LOG_DAEMON);
 	log_verbose(verbose);
 
 	/* Create newd control socket outside chroot. */
@@ -88,9 +88,9 @@ frontend(int debug, int verbose, char *sockname)
 	if (chdir("/") == -1)
 		fatal("chdir(\"/\")");
 
-	setproctitle("frontend");
 	newd_process = PROC_FRONTEND;
-	log_procname = log_procnames[newd_process];
+	setproctitle(log_procnames[newd_process]);
+	log_procinit(log_procnames[newd_process]);
 
 	if (setgroups(1, &pw->pw_gid) ||
 	    setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) ||

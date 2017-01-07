@@ -36,7 +36,6 @@
 #include "newd.h"
 #include "control.h"
 #include "frontend.h"
-#include "log.h"
 
 #define	CONTROL_BACKLOG	5
 

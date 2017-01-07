@@ -22,6 +22,7 @@
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <sys/socket.h>
+#include <sys/syslog.h>
 #include <sys/uio.h>
 
 #include <netinet/in.h>
@@ -37,7 +38,6 @@
 
 #include "newd.h"
 #include "engine.h"
-#include "log.h"
 
 __dead void	 engine_shutdown(void);
 void		 engine_sig_handler(int sig, short, void *);
@@ -74,7 +74,7 @@ engine(int debug, int verbose)
 
 	engine_conf = config_new_empty();
 
-	log_init(debug);
+	log_init(debug, LOG_DAEMON);
 	log_verbose(verbose);
 
 	if ((pw = getpwnam(NEWD_USER)) == NULL)
@@ -85,9 +85,9 @@ engine(int debug, int verbose)
 	if (chdir("/") == -1)
 		fatal("chdir(\"/\")");
 
-	setproctitle("engine");
 	newd_process = PROC_ENGINE;
-	log_procname = log_procnames[newd_process];
+	setproctitle(log_procnames[newd_process]);
+	log_procinit(log_procnames[newd_process]);
 
 	if (setgroups(1, &pw->pw_gid) ||
 	    setresgid(pw->pw_gid, pw->pw_gid, pw->pw_gid) ||

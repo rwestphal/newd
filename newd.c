@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <sys/queue.h>
 #include <sys/socket.h>
+#include <sys/syslog.h>
 #include <sys/uio.h>
 #include <sys/wait.h>
 
@@ -41,7 +42,6 @@
 #include "frontend.h"
 #include "engine.h"
 #include "control.h"
-#include "log.h"
 
 __dead void	usage(void);
 __dead void	main_shutdown(void);
@@ -113,11 +113,9 @@ main(int argc, char *argv[])
 	int		 pipe_main2engine[2];
 
 	conffile = CONF_FILE;
-	newd_process = PROC_MAIN;
-	log_procname = log_procnames[newd_process];
 	sockname = NEWD_SOCKET;
 
-	log_init(1);	/* Log to stderr until daemonized. */
+	log_init(1, LOG_DAEMON);	/* Log to stderr until daemonized. */
 	log_verbose(1);
 
 	saved_argv0 = argv[0];
@@ -185,7 +183,7 @@ main(int argc, char *argv[])
 	if (getpwnam(NEWD_USER) == NULL)
 		errx(1, "unknown user %s", NEWD_USER);
 
-	log_init(debug);
+	log_init(debug, LOG_DAEMON);
 	log_verbose(main_conf->opts & OPT_VERBOSE);
 
 	if (!debug)
@@ -206,7 +204,10 @@ main(int argc, char *argv[])
 	frontend_pid = start_child(PROC_FRONTEND, saved_argv0,
 	    pipe_main2frontend[1], debug, opts & OPT_VERBOSE, sockname);
 
-	setproctitle("main");
+	newd_process = PROC_MAIN;
+	setproctitle(log_procnames[newd_process]);
+	log_procinit(log_procnames[newd_process]);
+
 	event_init();
 
 	/* Setup signal handler. */
