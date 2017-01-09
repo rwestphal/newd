@@ -53,7 +53,7 @@ void	main_dispatch_frontend(int, short, void *);
 void	main_dispatch_engine(int, short, void *);
 
 static int	main_imsg_send_ipc_sockets(struct imsgbuf *, struct imsgbuf *);
-static int     main_imsg_send_config(struct newd_conf *);
+static int	main_imsg_send_config(struct newd_conf *);
 
 int	main_reload(void);
 int	main_sendboth(enum imsg_type, void *, u_int16_t);
