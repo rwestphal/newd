@@ -115,7 +115,7 @@ main(int argc, char *argv[])
 	sockname = NEWD_SOCKET;
 
 	log_init(1, LOG_DAEMON);	/* Log to stderr until daemonized. */
-	log_verbose(1);
+	log_setverbose(1);
 
 	saved_argv0 = argv[0];
 	if (saved_argv0 == NULL)
@@ -183,7 +183,7 @@ main(int argc, char *argv[])
 		errx(1, "unknown user %s", NEWD_USER);
 
 	log_init(debug, LOG_DAEMON);
-	log_verbose(main_conf->opts & OPT_VERBOSE);
+	log_setverbose(main_conf->opts & OPT_VERBOSE);
 
 	if (!debug)
 		daemon(1, 0);
@@ -372,7 +372,7 @@ main_dispatch_frontend(int fd, short event, void *bula)
 		case IMSG_CTL_LOG_VERBOSE:
 			/* Already checked by frontend. */
 			memcpy(&verbose, imsg.data, sizeof(verbose));
-			log_verbose(verbose);
+			log_setverbose(verbose);
 			break;
 		case IMSG_CTL_SHOW_MAIN_INFO:
 			main_showinfo_ctl(&imsg);

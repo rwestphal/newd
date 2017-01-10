@@ -72,7 +72,7 @@ frontend(int debug, int verbose, char *sockname)
 	frontend_conf = config_new_empty();
 
 	log_init(debug, LOG_DAEMON);
-	log_verbose(verbose);
+	log_setverbose(verbose);
 
 	/* Create newd control socket outside chroot. */
 	frontend_conf->csock = strdup(sockname);

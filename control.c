@@ -263,7 +263,7 @@ control_dispatch_imsg(int fd, short event, void *bula)
 			    imsg.hdr.len - IMSG_HEADER_SIZE);
 
 			memcpy(&verbose, imsg.data, sizeof(verbose));
-			log_verbose(verbose);
+			log_setverbose(verbose);
 			break;
 		case IMSG_CTL_SHOW_MAIN_INFO:
 			c->iev.ibuf.pid = imsg.hdr.pid;

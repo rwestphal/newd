@@ -74,7 +74,7 @@ engine(int debug, int verbose)
 	engine_conf = config_new_empty();
 
 	log_init(debug, LOG_DAEMON);
-	log_verbose(verbose);
+	log_setverbose(verbose);
 
 	if ((pw = getpwnam(NEWD_USER)) == NULL)
 		fatal("getpwnam");
@@ -185,7 +185,7 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 		case IMSG_CTL_LOG_VERBOSE:
 			/* Already checked by frontend. */
 			memcpy(&verbose, imsg.data, sizeof(verbose));
-			log_verbose(verbose);
+			log_setverbose(verbose);
 			break;
 		case IMSG_CTL_SHOW_ENGINE_INFO:
 			engine_showinfo_ctl(&imsg);
