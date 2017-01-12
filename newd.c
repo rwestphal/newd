@@ -378,8 +378,8 @@ main_dispatch_frontend(int fd, short event, void *bula)
 			main_showinfo_ctl(&imsg);
 			break;
 		default:
-			log_debug("main_dispatch_frontend: error handling "
-			    "imsg %d", imsg.hdr.type);
+			log_debug("%s: error handling imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);
@@ -425,8 +425,8 @@ main_dispatch_engine(int fd, short event, void *bula)
 
 		switch (imsg.hdr.type) {
 		default:
-			log_debug("main_dispatch_engine: error handling "
-			    "imsg %d", imsg.hdr.type);
+			log_debug("%s: error handling imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);
@@ -561,21 +561,21 @@ main_showinfo_ctl(struct imsg *imsg)
 		n = strlcpy(cmi.text, "I'm a little teapot.",
 		    sizeof(cmi.text));
 		if (n >= sizeof(cmi.text))
-			log_debug("main_showinfo_ctl: I was cut off!");
+			log_debug("%s: I was cut off!", __func__);
 		main_imsg_compose_frontend(IMSG_CTL_SHOW_MAIN_INFO,
 		    imsg->hdr.pid, &cmi, sizeof(cmi));
 		memset(cmi.text, 0, sizeof(cmi.text));
 		n = strlcpy(cmi.text, "Full of sencha.",
 		    sizeof(cmi.text));
 		if (n >= sizeof(cmi.text))
-			log_debug("main_showinfo_ctl: I was cut off!");
+			log_debug("%s: I was cut off!", __func__);
 		main_imsg_compose_frontend(IMSG_CTL_SHOW_MAIN_INFO,
 		    imsg->hdr.pid, &cmi, sizeof(cmi));
 		main_imsg_compose_frontend(IMSG_CTL_END, imsg->hdr.pid, NULL,
 		    0);
 		break;
 	default:
-		log_debug("main_showinfo_ctl: error handling imsg");
+		log_debug("%s: error handling imsg", __func__);
 		break;
 	}
 }

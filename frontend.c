@@ -190,7 +190,7 @@ frontend_dispatch_main(int fd, short event, void *bula)
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
-			fatal("frontend_dispatch_main: imsg_get error");
+			fatal("%s: imsg_get error", __func__);
 		if (n == 0)	/* No more messages. */
 			break;
 
@@ -246,8 +246,8 @@ frontend_dispatch_main(int fd, short event, void *bula)
 			control_imsg_relay(&imsg);
 			break;
 		default:
-			log_debug("frontend_dispatch_main: error handling "
-			    "imsg %d", imsg.hdr.type);
+			log_debug("%s: error handling imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);
@@ -284,7 +284,7 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
-			fatal("frontend_dispatch_engine: imsg_get error");
+			fatal("%s: imsg_get error", __func__);
 		if (n == 0)	/* No more messages. */
 			break;
 
@@ -294,8 +294,8 @@ frontend_dispatch_engine(int fd, short event, void *bula)
 			control_imsg_relay(&imsg);
 			break;
 		default:
-			log_debug("frontend_dispatch_engine: error handling "
-			    "imsg %d", imsg.hdr.type);
+			log_debug("%s: error handling imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);

@@ -177,7 +177,7 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
-			fatal("engine_dispatch_main: imsg_get error");
+			fatal("%s: imsg_get error", __func__);
 		if (n == 0)	/* No more messages. */
 			break;
 
@@ -191,8 +191,8 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 			engine_showinfo_ctl(&imsg);
 			break;
 		default:
-			log_debug("engine_dispatch_frontend: unexpected "
-			    "imsg %d", imsg.hdr.type);
+			log_debug("%s: unexpected imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);
@@ -233,7 +233,7 @@ engine_dispatch_main(int fd, short event, void *bula)
 
 	for (;;) {
 		if ((n = imsg_get(ibuf, &imsg)) == -1)
-			fatal("engine_dispatch_main: imsg_get error");
+			fatal("%s: imsg_get error", __func__);
 		if (n == 0)	/* No more messages. */
 			break;
 
@@ -284,7 +284,7 @@ engine_dispatch_main(int fd, short event, void *bula)
 			nconf = NULL;
 			break;
 		default:
-			log_debug("engine_dispatch_main: unexpected imsg %d",
+			log_debug("%s: unexpected imsg %d", __func__,
 			    imsg.hdr.type);
 			break;
 		}
@@ -333,7 +333,7 @@ engine_showinfo_ctl(struct imsg *imsg)
 		    0);
 		break;
 	default:
-		log_debug("engine_showinfo_ctl: error handling imsg");
+		log_debug("%s: error handling imsg", __func__);
 		break;
 	}
 }

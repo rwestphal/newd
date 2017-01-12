@@ -51,7 +51,7 @@ control_init(char *path)
 
 	if ((fd = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK,
 	    0)) == -1) {
-		log_warn("control_init: socket");
+		log_warn("%s: socket", __func__);
 		return (-1);
 	}
 
@@ -61,14 +61,14 @@ control_init(char *path)
 
 	if (unlink(path) == -1)
 		if (errno != ENOENT) {
-			log_warn("control_init: unlink %s", path);
+			log_warn("%s: unlink %s", __func__, path);
 			close(fd);
 			return (-1);
 		}
 
 	old_umask = umask(S_IXUSR|S_IXGRP|S_IWOTH|S_IROTH|S_IXOTH);
 	if (bind(fd, (struct sockaddr *)&sun, sizeof(sun)) == -1) {
-		log_warn("control_init: bind: %s", path);
+		log_warn("%s: bind: %s", __func__, path);
 		close(fd);
 		umask(old_umask);
 		return (-1);
@@ -76,7 +76,7 @@ control_init(char *path)
 	umask(old_umask);
 
 	if (chmod(path, S_IRUSR|S_IWUSR|S_IRGRP|S_IWGRP) == -1) {
-		log_warn("control_init: chmod");
+		log_warn("%s: chmod", __func__);
 		close(fd);
 		(void)unlink(path);
 		return (-1);
@@ -92,7 +92,7 @@ control_listen(void)
 {
 
 	if (listen(control_state.fd, CONTROL_BACKLOG) == -1) {
-		log_warn("control_listen: listen");
+		log_warn("%s: listen", __func__);
 		return (-1);
 	}
 
@@ -140,12 +140,12 @@ control_accept(int listenfd, short event, void *bula)
 			evtimer_add(&control_state.evt, &evtpause);
 		} else if (errno != EWOULDBLOCK && errno != EINTR &&
 		    errno != ECONNABORTED)
-			log_warn("control_accept: accept");
+			log_warn("%s: accept", __func__);
 		return;
 	}
 
 	if ((c = calloc(1, sizeof(struct ctl_conn))) == NULL) {
-		log_warn("control_accept");
+		log_warn("%s: calloc", __func__);
 		close(connfd);
 		return;
 	}
@@ -192,7 +192,7 @@ control_close(int fd)
 	struct ctl_conn	*c;
 
 	if ((c = control_connbyfd(fd)) == NULL) {
-		log_warn("control_close: fd %d: not found", fd);
+		log_warn("%s: fd %d: not found", __func__, fd);
 		return;
 	}
 
@@ -220,7 +220,7 @@ control_dispatch_imsg(int fd, short event, void *bula)
 	int		 verbose;
 
 	if ((c = control_connbyfd(fd)) == NULL) {
-		log_warn("control_dispatch_imsg: fd %d: not found", fd);
+		log_warn("%s: fd %d: not found", __func__, fd);
 		return;
 	}
 
@@ -282,8 +282,8 @@ control_dispatch_imsg(int fd, short event, void *bula)
 			    imsg.data, imsg.hdr.len - IMSG_HEADER_SIZE);
 			break;
 		default:
-			log_debug("control_dispatch_imsg: "
-			    "error handling imsg %d", imsg.hdr.type);
+			log_debug("%s: error handling imsg %d", __func__,
+			    imsg.hdr.type);
 			break;
 		}
 		imsg_free(&imsg);
