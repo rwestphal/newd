@@ -67,6 +67,8 @@ char			*conffile;
 pid_t	 frontend_pid;
 pid_t	 engine_pid;
 
+uint32_t cmd_opts;
+
 void
 main_sig_handler(int sig, short event, void *arg)
 {
@@ -104,7 +106,7 @@ int
 main(int argc, char *argv[])
 {
 	struct event	 ev_sigint, ev_sigterm, ev_sighup;
-	int		 ch, opts = 0;
+	int		 ch;
 	int		 debug = 0, engine_flag = 0, frontend_flag = 0;
 	char		*sockname;
 	char		*saved_argv0;
@@ -136,15 +138,15 @@ main(int argc, char *argv[])
 			conffile = optarg;
 			break;
 		case 'n':
-			opts |= OPT_NOACTION;
+			cmd_opts |= OPT_NOACTION;
 			break;
 		case 's':
 			sockname = optarg;
 			break;
 		case 'v':
-			if (opts & OPT_VERBOSE)
-				opts |= OPT_VERBOSE2;
-			opts |= OPT_VERBOSE;
+			if (cmd_opts & OPT_VERBOSE)
+				cmd_opts |= OPT_VERBOSE2;
+			cmd_opts |= OPT_VERBOSE;
 			break;
 		default:
 			usage();
@@ -157,17 +159,17 @@ main(int argc, char *argv[])
 		usage();
 
 	if (engine_flag)
-		engine(debug, opts & OPT_VERBOSE);
+		engine(debug, cmd_opts & OPT_VERBOSE);
 	else if (frontend_flag)
-		frontend(debug, opts & OPT_VERBOSE, sockname);
+		frontend(debug, cmd_opts & OPT_VERBOSE, sockname);
 
 	/* parse config file */
-	if ((main_conf = parse_config(conffile, opts)) == NULL) {
+	if ((main_conf = parse_config(conffile)) == NULL) {
 		exit(1);
 	}
 
-	if (main_conf->opts & OPT_NOACTION) {
-		if (main_conf->opts & OPT_VERBOSE)
+	if (cmd_opts & OPT_NOACTION) {
+		if (cmd_opts & OPT_VERBOSE)
 			print_config(main_conf);
 		else
 			fprintf(stderr, "configuration OK\n");
@@ -183,7 +185,7 @@ main(int argc, char *argv[])
 		errx(1, "unknown user %s", NEWD_USER);
 
 	log_init(debug, LOG_DAEMON);
-	log_setverbose(main_conf->opts & OPT_VERBOSE);
+	log_setverbose(cmd_opts & OPT_VERBOSE);
 
 	if (!debug)
 		daemon(1, 0);
@@ -199,9 +201,9 @@ main(int argc, char *argv[])
 
 	/* Start children. */
 	engine_pid = start_child(PROC_ENGINE, saved_argv0, pipe_main2engine[1],
-	    debug, opts & OPT_VERBOSE, NULL);
+	    debug, cmd_opts & OPT_VERBOSE, NULL);
 	frontend_pid = start_child(PROC_FRONTEND, saved_argv0,
-	    pipe_main2frontend[1], debug, opts & OPT_VERBOSE, sockname);
+	    pipe_main2frontend[1], debug, cmd_opts & OPT_VERBOSE, sockname);
 
 	newd_process = PROC_MAIN;
 	setproctitle(log_procnames[newd_process]);
@@ -506,7 +508,7 @@ main_reload(void)
 {
 	struct newd_conf *xconf;
 
-	if ((xconf = parse_config(conffile, main_conf->opts)) == NULL)
+	if ((xconf = parse_config(conffile)) == NULL)
 		return (-1);
 
 	if (main_imsg_send_config(xconf) == -1)
@@ -585,7 +587,6 @@ merge_config(struct newd_conf *conf, struct newd_conf *xconf)
 {
 	struct group	*g;
 
-	conf->opts = xconf->opts;
 	conf->yesno = xconf->yesno;
 	conf->integer = xconf->integer;
 	memcpy(conf->global_text, xconf->global_text,

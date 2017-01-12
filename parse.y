@@ -156,7 +156,7 @@ yesno		: YES	{ $$ = 1; }
 
 varset		: STRING '=' string		{
 			char *s = $1;
-			if (conf->opts & OPT_VERBOSE)
+			if (cmd_opts & OPT_VERBOSE)
 				printf("%s = \"%s\"\n", $1, $3);
 			while (*s++) {
 				if (isspace((unsigned char)*s)) {
@@ -607,15 +607,13 @@ popfile(void)
 }
 
 struct newd_conf *
-parse_config(char *filename, int opts)
+parse_config(char *filename)
 {
 	struct sym	*sym, *next;
 
 	conf = config_new_empty();
 
-	conf->opts = opts;
-
-	file = pushfile(filename, !(conf->opts & OPT_NOACTION));
+	file = pushfile(filename, !(cmd_opts & OPT_NOACTION));
 	if (file == NULL) {
 		free(conf);
 		return (NULL);
@@ -630,7 +628,7 @@ parse_config(char *filename, int opts)
 
 	/* Free macros and check which have not been used. */
 	TAILQ_FOREACH_SAFE(sym, &symhead, entry, next) {
-		if ((conf->opts & OPT_VERBOSE2) && !sym->used)
+		if ((cmd_opts & OPT_VERBOSE2) && !sym->used)
 			fprintf(stderr, "warning: macro '%s' not used\n",
 			    sym->nam);
 		if (!sym->persist) {

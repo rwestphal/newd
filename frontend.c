@@ -314,7 +314,6 @@ frontend_showinfo_ctl(struct ctl_conn *c)
 {
 	static struct ctl_frontend_info cfi;
 
-	cfi.opts = frontend_conf->opts;
 	cfi.yesno = frontend_conf->yesno;
 	cfi.integer = frontend_conf->integer;
 

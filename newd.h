@@ -21,6 +21,10 @@
 #define	NEWD_SOCKET		"/var/run/newd.sock"
 #define NEWD_USER		"_newd"
 
+#define OPT_VERBOSE	0x00000001
+#define OPT_VERBOSE2	0x00000002
+#define OPT_NOACTION	0x00000004
+
 #define NEWD_MAXTEXT		256
 #define NEWD_MAXGROUPNAME	16
 
@@ -71,10 +75,6 @@ struct group {
 
 struct newd_conf {
 	char		*csock;
-	uint32_t	opts;
-#define OPT_VERBOSE	0x00000001
-#define OPT_VERBOSE2	0x00000002
-#define OPT_NOACTION	0x00000004
 	int		yesno;
 	int		integer;
 	char		global_text[NEWD_MAXTEXT];
@@ -82,7 +82,6 @@ struct newd_conf {
 };
 
 struct ctl_frontend_info {
-	uint32_t	opts;
 	int		yesno;
 	int		integer;
 	char		global_text[NEWD_MAXTEXT];
@@ -102,6 +101,8 @@ struct ctl_main_info {
 	char		text[NEWD_MAXTEXT];
 };
 
+extern uint32_t	 cmd_opts;
+
 /* newd.c */
 void	main_imsg_compose_frontend(int, pid_t, void *, uint16_t);
 void	main_imsg_compose_engine(int, pid_t, void *, uint16_t);
@@ -117,7 +118,7 @@ void			config_clear(struct newd_conf *);
 void	print_config(struct newd_conf *);
 
 /* parse.y */
-struct newd_conf	*parse_config(char *, int);
+struct newd_conf	*parse_config(char *);
 int			 cmdline_symset(char *);
 
 /* log.c */
