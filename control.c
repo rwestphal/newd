@@ -192,7 +192,7 @@ control_close(int fd)
 	struct ctl_conn	*c;
 
 	if ((c = control_connbyfd(fd)) == NULL) {
-		log_warn("%s: fd %d: not found", __func__, fd);
+		log_warnx("%s: fd %d: not found", __func__, fd);
 		return;
 	}
 
@@ -220,7 +220,7 @@ control_dispatch_imsg(int fd, short event, void *bula)
 	int		 verbose;
 
 	if ((c = control_connbyfd(fd)) == NULL) {
-		log_warn("%s: fd %d: not found", __func__, fd);
+		log_warnx("%s: fd %d: not found", __func__, fd);
 		return;
 	}
 
