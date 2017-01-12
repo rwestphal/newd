@@ -55,7 +55,7 @@ control_init(char *path)
 		return (-1);
 	}
 
-	bzero(&sun, sizeof(sun));
+	memset(&sun, 0, sizeof(sun));
 	sun.sun_family = AF_UNIX;
 	strlcpy(sun.sun_path, path, sizeof(sun.sun_path));
 
