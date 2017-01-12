@@ -56,7 +56,7 @@ static int	main_imsg_send_ipc_sockets(struct imsgbuf *, struct imsgbuf *);
 static int	main_imsg_send_config(struct newd_conf *);
 
 int	main_reload(void);
-int	main_sendboth(enum imsg_type, void *, u_int16_t);
+int	main_sendboth(enum imsg_type, void *, uint16_t);
 void	main_showinfo_ctl(struct imsg *);
 
 struct newd_conf	*main_conf;
@@ -441,7 +441,7 @@ main_dispatch_engine(int fd, short event, void *bula)
 }
 
 void
-main_imsg_compose_frontend(int type, pid_t pid, void *data, u_int16_t datalen)
+main_imsg_compose_frontend(int type, pid_t pid, void *data, uint16_t datalen)
 {
 	if (iev_frontend)
 		imsg_compose_event(iev_frontend, type, 0, pid, -1, data,
@@ -449,7 +449,7 @@ main_imsg_compose_frontend(int type, pid_t pid, void *data, u_int16_t datalen)
 }
 
 void
-main_imsg_compose_engine(int type, pid_t pid, void *data, u_int16_t datalen)
+main_imsg_compose_engine(int type, pid_t pid, void *data, uint16_t datalen)
 {
 	if (iev_engine)
 		imsg_compose_event(iev_engine, type, 0, pid, -1, data,
@@ -469,8 +469,8 @@ imsg_event_add(struct imsgev *iev)
 }
 
 int
-imsg_compose_event(struct imsgev *iev, u_int16_t type, u_int32_t peerid,
-    pid_t pid, int fd, void *data, u_int16_t datalen)
+imsg_compose_event(struct imsgev *iev, uint16_t type, uint32_t peerid,
+    pid_t pid, int fd, void *data, uint16_t datalen)
 {
 	int	ret;
 
@@ -540,7 +540,7 @@ main_imsg_send_config(struct newd_conf *xconf)
 }
 
 int
-main_sendboth(enum imsg_type type, void *buf, u_int16_t len)
+main_sendboth(enum imsg_type type, void *buf, uint16_t len)
 {
 	if (imsg_compose_event(iev_frontend, type, 0, 0, -1, buf, len) == -1)
 		return (-1);

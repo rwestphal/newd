@@ -17,4 +17,4 @@
  */
 
 pid_t		 engine(int, int);
-int		 engine_imsg_compose_frontend(int, pid_t, void *, u_int16_t);
+int		 engine_imsg_compose_frontend(int, pid_t, void *, uint16_t);

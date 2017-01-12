@@ -21,7 +21,7 @@ TAILQ_HEAD(ctl_conns, ctl_conn)	ctl_conns;
 pid_t		 frontend(int, int, char *);
 void		 frontend_dispatch_main(int, short, void *);
 void		 frontend_dispatch_engine(int, short, void *);
-int		 frontend_imsg_compose_main(int, pid_t, void *, u_int16_t);
-int		 frontend_imsg_compose_engine(int, u_int32_t, pid_t, void *,
-		     u_int16_t);
+int		 frontend_imsg_compose_main(int, pid_t, void *, uint16_t);
+int		 frontend_imsg_compose_engine(int, uint32_t, pid_t, void *,
+		     uint16_t);
 void		 frontend_showinfo_ctl(struct ctl_conn *);

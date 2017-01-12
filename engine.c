@@ -145,7 +145,7 @@ engine_shutdown(void)
 
 int
 engine_imsg_compose_frontend(int type, pid_t pid, void *data,
-    u_int16_t datalen)
+    uint16_t datalen)
 {
 	return (imsg_compose_event(iev_frontend, type, 0, pid, -1,
 	    data, datalen));

@@ -71,7 +71,7 @@ struct group {
 
 struct newd_conf {
 	char		*csock;
-	u_int32_t	opts;
+	uint32_t	opts;
 #define OPT_VERBOSE	0x00000001
 #define OPT_VERBOSE2	0x00000002
 #define OPT_NOACTION	0x00000004
@@ -82,7 +82,7 @@ struct newd_conf {
 };
 
 struct ctl_frontend_info {
-	u_int32_t	opts;
+	uint32_t	opts;
 	int		yesno;
 	int		integer;
 	char		global_text[NEWD_MAXTEXT];
@@ -103,12 +103,12 @@ struct ctl_main_info {
 };
 
 /* newd.c */
-void	main_imsg_compose_frontend(int, pid_t, void *, u_int16_t);
-void	main_imsg_compose_engine(int, pid_t, void *, u_int16_t);
+void	main_imsg_compose_frontend(int, pid_t, void *, uint16_t);
+void	main_imsg_compose_engine(int, pid_t, void *, uint16_t);
 void	merge_config(struct newd_conf *, struct newd_conf *);
 void	imsg_event_add(struct imsgev *);
-int	imsg_compose_event(struct imsgev *, u_int16_t, u_int32_t, pid_t,
-	    int, void *, u_int16_t);
+int	imsg_compose_event(struct imsgev *, uint16_t, uint32_t, pid_t,
+	    int, void *, uint16_t);
 
 struct newd_conf       *config_new_empty(void);
 void			config_clear(struct newd_conf *);

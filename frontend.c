@@ -152,15 +152,15 @@ frontend_shutdown(void)
 
 int
 frontend_imsg_compose_main(int type, pid_t pid, void *data,
-    u_int16_t datalen)
+    uint16_t datalen)
 {
 	return (imsg_compose_event(iev_main, type, 0, pid, -1, data,
 	    datalen));
 }
 
 int
-frontend_imsg_compose_engine(int type, u_int32_t peerid, pid_t pid,
-    void *data, u_int16_t datalen)
+frontend_imsg_compose_engine(int type, uint32_t peerid, pid_t pid,
+    void *data, uint16_t datalen)
 {
 	return (imsg_compose_event(iev_engine, type, peerid, pid, -1,
 	    data, datalen));
