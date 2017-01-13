@@ -63,7 +63,7 @@ frontend_sig_handler(int sig, short event, void *bula)
 	}
 }
 
-pid_t
+void
 frontend(int debug, int verbose, char *sockname)
 {
 	struct event	 ev_sigint, ev_sigterm;
@@ -126,7 +126,6 @@ frontend(int debug, int verbose, char *sockname)
 	event_dispatch();
 
 	frontend_shutdown();
-	return (0);
 }
 
 __dead void

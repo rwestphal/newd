@@ -65,7 +65,7 @@ engine_sig_handler(int sig, short event, void *arg)
 	}
 }
 
-pid_t
+void
 engine(int debug, int verbose)
 {
 	struct event		 ev_sigint, ev_sigterm;
@@ -122,8 +122,6 @@ engine(int debug, int verbose)
 	event_dispatch();
 
 	engine_shutdown();
-
-	return (0);
 }
 
 __dead void
