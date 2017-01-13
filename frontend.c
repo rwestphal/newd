@@ -135,15 +135,15 @@ frontend_shutdown(void)
 	msgbuf_write(&iev_engine->ibuf.w);
 	msgbuf_clear(&iev_engine->ibuf.w);
 	close(iev_engine->ibuf.fd);
-
 	msgbuf_write(&iev_main->ibuf.w);
 	msgbuf_clear(&iev_main->ibuf.w);
 	close(iev_main->ibuf.fd);
 
-	/* Clean up. */
+	control_cleanup(frontend_conf->csock);
+	config_clear(frontend_conf);
+
 	free(iev_engine);
 	free(iev_main);
-	free(frontend_conf);
 
 	log_info("frontend exiting");
 	exit(0);

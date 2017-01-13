@@ -133,9 +133,10 @@ engine_shutdown(void)
 	msgbuf_clear(&iev_main->ibuf.w);
 	close(iev_main->ibuf.fd);
 
+	config_clear(engine_conf);
+
 	free(iev_frontend);
 	free(iev_main);
-	free(engine_conf);
 
 	log_info("engine exiting");
 	exit(0);

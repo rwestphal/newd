@@ -266,7 +266,6 @@ main_shutdown(void)
 	msgbuf_clear(&iev_engine->ibuf.w);
 	close(iev_engine->ibuf.fd);
 
-	control_cleanup(main_conf->csock);
 	config_clear(main_conf);
 
 	log_debug("waiting for children to terminate");
@@ -283,7 +282,6 @@ main_shutdown(void)
 
 	free(iev_frontend);
 	free(iev_engine);
-	free(main_conf);
 
 	log_info("terminating");
 	exit(0);
