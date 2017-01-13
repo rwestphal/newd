@@ -42,7 +42,7 @@
 __dead void	 frontend_shutdown(void);
 void		 frontend_sig_handler(int, short, void *);
 
-struct newd_conf	*frontend_conf = NULL, *nconf;
+struct newd_conf	*frontend_conf;
 struct imsgev		*iev_main;
 struct imsgev		*iev_engine;
 
@@ -168,11 +168,12 @@ frontend_imsg_compose_engine(int type, uint32_t peerid, pid_t pid,
 void
 frontend_dispatch_main(int fd, short event, void *bula)
 {
-	struct imsg	 imsg;
-	struct group	*g;
-	struct imsgev	*iev = bula;
-	struct imsgbuf	*ibuf = &iev->ibuf;
-	int		 n, shut = 0;
+	static struct newd_conf	*nconf;
+	struct imsg		 imsg;
+	struct group		*g;
+	struct imsgev		*iev = bula;
+	struct imsgbuf		*ibuf = &iev->ibuf;
+	int			 n, shut = 0;
 
 	if (event & EV_READ) {
 		if ((n = imsg_read(ibuf)) == -1 && errno != EAGAIN)

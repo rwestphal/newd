@@ -44,7 +44,7 @@ void		 engine_dispatch_frontend(int, short, void *);
 void		 engine_dispatch_main(int, short, void *);
 void		 engine_showinfo_ctl(struct imsg *);
 
-struct newd_conf	*engine_conf, *nconf;
+struct newd_conf	*engine_conf;
 struct imsgev		*iev_frontend;
 struct imsgev		*iev_main;
 
@@ -207,6 +207,7 @@ engine_dispatch_frontend(int fd, short event, void *bula)
 void
 engine_dispatch_main(int fd, short event, void *bula)
 {
+	static struct newd_conf	*nconf;
 	struct imsg		 imsg;
 	struct group		*g;
 	struct imsgev		*iev = bula;

@@ -84,9 +84,9 @@ char	*symget(const char *);
 void	 clear_config(struct newd_conf *xconf);
 
 static struct newd_conf	*conf;
-static int		 errors = 0;
+static int		 errors;
 
-static struct group	*group = NULL;
+static struct group	*group;
 
 struct group	*conf_get_group(char *);
 void		*conf_del_group(struct group *);
