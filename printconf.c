@@ -36,8 +36,6 @@ print_config(struct newd_conf *conf)
 	struct group *g;
 	char buf[INET6_ADDRSTRLEN], *bufp;
 
-	printf("csock %s\n", conf->csock);
-
 	printf("yesno %s\n", conf->yesno ? "yes" : "no");
 	printf("integer %d\n", conf->integer);
 	printf("\n");

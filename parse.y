@@ -760,6 +760,5 @@ clear_config(struct newd_conf *xconf)
 		free(g);
 	}
 
-	free(xconf->csock);
 	free(xconf);
 }

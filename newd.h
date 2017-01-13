@@ -73,7 +73,6 @@ struct group {
 };
 
 struct newd_conf {
-	char		*csock;
 	int		yesno;
 	int		integer;
 	char		global_text[NEWD_MAXTEXT];
@@ -101,6 +100,7 @@ struct ctl_main_info {
 };
 
 extern uint32_t	 cmd_opts;
+extern char	*csock;
 
 /* newd.c */
 void	main_imsg_compose_frontend(int, pid_t, void *, uint16_t);
