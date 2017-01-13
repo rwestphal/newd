@@ -140,7 +140,7 @@ control_accept(int listenfd, short event, void *bula)
 			evtimer_add(&control_state.evt, &evtpause);
 		} else if (errno != EWOULDBLOCK && errno != EINTR &&
 		    errno != ECONNABORTED)
-			log_warn("%s: accept", __func__);
+			log_warn("%s: accept4", __func__);
 		return;
 	}
 
